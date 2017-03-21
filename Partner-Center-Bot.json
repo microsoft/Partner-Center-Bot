@@ -1,0 +1,110 @@
+{
+  "luis_schema_version": "2.0.0",
+  "versionId": "0.1",
+  "name": "Partner-Center-Bot",
+  "desc": "",
+  "culture": "en-us",
+  "intents": [
+    {
+      "name": "ListCustomers"
+    },
+    {
+      "name": "ListSubscriptions"
+    },
+    {
+      "name": "None"
+    },
+    {
+      "name": "Question"
+    },
+    {
+      "name": "SelectCustomer"
+    },
+    {
+      "name": "SelectSubscription"
+    }
+  ],
+  "entities": [
+    {
+      "name": "identifier"
+    }
+  ],
+  "composites": [],
+  "closedLists": [],
+  "bing_entities": [],
+  "actions": [],
+  "model_features": [
+    {
+      "name": "ListShow",
+      "mode": true,
+      "words": "list,show",
+      "activated": true
+    }
+  ],
+  "regex_features": [
+    {
+      "name": "identifier",
+      "pattern": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+      "activated": true
+    }
+  ],
+  "utterances": [
+    {
+      "text": "list customers",
+      "intent": "ListCustomers",
+      "entities": []
+    },
+    {
+      "text": "list subscriptions",
+      "intent": "ListSubscriptions",
+      "entities": []
+    },
+    {
+      "text": "select customer 9fc358e8-bc0a-4302-9eb4-1f143c6b01d3",
+      "intent": "SelectCustomer",
+      "entities": [
+        {
+          "entity": "identifier",
+          "startPos": 16,
+          "endPos": 51
+        }
+      ]
+    },
+    {
+      "text": "where",
+      "intent": "Question",
+      "entities": []
+    },
+    {
+      "text": "why",
+      "intent": "Question",
+      "entities": []
+    },
+    {
+      "text": "how",
+      "intent": "Question",
+      "entities": []
+    },
+    {
+      "text": "what",
+      "intent": "Question",
+      "entities": []
+    },
+    {
+      "text": "can i",
+      "intent": "Question",
+      "entities": []
+    },
+    {
+      "text": "select subscription e3245f92-b68c-442c-bc1b-ecd340a0a22e",
+      "intent": "SelectSubscription",
+      "entities": [
+        {
+          "entity": "identifier",
+          "startPos": 20,
+          "endPos": 55
+        }
+      ]
+    }
+  ]
+}

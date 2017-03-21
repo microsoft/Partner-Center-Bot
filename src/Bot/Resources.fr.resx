@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AuthenticationSuccessDoneMessage" xml:space="preserve">
+    <value>Salut {0} ! Que voulez-vous faire ?</value>
+  </data>
+  <data name="DataProtectionUnprotectException" xml:space="preserve">
+    <value>Échec de déprotéger les données spécifiées.</value>
+  </data>
+  <data name="HelpMessage" xml:space="preserve">
+    <value>Vous pouvez interagir avec moi de la manière suivante :</value>
+  </data>
+  <data name="InvalidAuthenticationException" xml:space="preserve">
+    <value>La demande d’authentification n’était pas valide. Essayer d’authentifier à nouveau si le problème persiste contactez le support.</value>
+  </data>
+  <data name="ListCustomersHelpMessage" xml:space="preserve">
+    <value>liste clients</value>
+  </data>
+  <data name="ListOperation" xml:space="preserve">
+    <value>liste</value>
+  </data>
+  <data name="ListSubscriptionssHelpMessage" xml:space="preserve">
+    <value>abonnements</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>ouverture de session</value>
+  </data>
+  <data name="LoginCaptial" xml:space="preserve">
+    <value>Ouverture de session</value>
+  </data>
+  <data name="NoRelationshipException" xml:space="preserve">
+    <value>Le compte d’utilisateur avec que vous authentifié n’est pas associé à un locataire qui a une relation avec le revendeur. Veuillez contacter le support pour les autres aides.</value>
+  </data>
+  <data name="NotAuthenticatedHelpMessage" xml:space="preserve">
+    <value>Vous devez d’abord se connecter avant d’interagir avec moi. Veuillez tapez ** login ** pour s’authentifier. Si vous avez encore besoin d’aide type ** aide ** après authentification, avec succès.</value>
+  </data>
+  <data name="RedisCacheConnectionException" xml:space="preserve">
+    <value>Impossible de se connecter à l’instance spécifiée.</value>
+  </data>
+  <data name="SigninCardText" xml:space="preserve">
+    <value>S’il vous plaît cliquez sur le bouton ci-dessous pour vous connecter.</value>
+  </data>
+  <data name="SuccessfulAuthentication" xml:space="preserve">
+    <value>Vous avez authentifié avec succès ! S’il vous plaît n’hésitez pas à fermer cette fenêtre et continuer à parler avec le bot.</value>
+  </data>
+  <data name="UnableToLocateCustomer" xml:space="preserve">
+    <value>Impossible de localiser le client sélectionné. Veuillez tapez ** liste clients ** et essayez à nouveau.</value>
+  </data>
+  <data name="Help" xml:space="preserve">
+    <value>Aide</value>
+  </data>
+  <data name="RewordQuestion" xml:space="preserve">
+    <value>Veuillez reformuler votre question et essayez à nouveau.</value>
+  </data>
+  <data name="InvalidCustomerContextException" xml:space="preserve">
+    <value>Vous devez sélectionner un client avant d’effectuer cette opération. Veuillez tapez ** liste clients **, sélectionner un client et puis essayez à nouveau.</value>
+  </data>
+  <data name="SubscriptionRequestMessage" xml:space="preserve">
+    <value>Voici les abonnements pour {0}</value>
+  </data>
+  <data name="ServiceInitializedException" xml:space="preserve">
+    <value>Ne peut invoquer cette fonction après que le service de la bot a été initialisé.</value>
+  </data>
+  <data name="CustomerContext" xml:space="preserve">
+    <value>Contexte client est maintenant configuré pour</value>
+  </data>
+  <data name="SelectCaptial" xml:space="preserve">
+    <value>Sélectionnez</value>
+  </data>
+  <data name="SubscriptionContext" xml:space="preserve">
+    <value>Contexte de l’abonnement est maintenant configuré pour</value>
+  </data>
+  <data name="UnableToLocateSubscription" xml:space="preserve">
+    <value>Impossible de localiser l’abonnement sélectionné. Veuillez tapez ** liste abonnements ** et essayez à nouveau.</value>
+  </data>
+  <data name="Welcome" xml:space="preserve">
+    <value>Bienvenue sur le Bot Partner Center. Vous devez d’abord se connecter avant d’interagir avec moi. Veuillez tapez ** login ** pour s’authentifier. Si vous avez encore besoin d’aide type ** aide ** après authentification, avec succès.</value>
+  </data>
+</root>
