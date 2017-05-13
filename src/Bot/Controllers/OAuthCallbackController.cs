@@ -245,10 +245,12 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
         /// </exception>
         private bool Validate(IBotData botData, IDictionary<string, string> stateData)
         {
+            string uniqueId;
+
             botData.AssertNotNull(nameof(botData));
             stateData.AssertNotNull(nameof(stateData));
 
-            if (botData.PrivateConversationData.TryGetValue(BotConstants.UniqueIdentifierKey, out string uniqueId))
+            if (botData.PrivateConversationData.TryGetValue(BotConstants.UniqueIdentifierKey, out uniqueId))
             {
                 if (!uniqueId.Equals(stateData[BotConstants.UniqueIdentifierKey], StringComparison.CurrentCultureIgnoreCase))
                 {

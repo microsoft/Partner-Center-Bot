@@ -143,7 +143,7 @@
     },
     "repoUrl": {
       "type": "string",
-      "defaultValue": "https://github.com/Microsoft/Partner-Center-Bot.git"
+      "defaultValue": "https://github.com/Microsoft/Partner-Center-Bot"
     },
     "siteName": {
       "type": "string",

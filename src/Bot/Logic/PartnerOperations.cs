@@ -78,7 +78,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
             {
                 startTime = DateTime.Now;
                 correlationId = Guid.NewGuid();
-                operations = await this.GetAppOperationsAsync(correlationId);
+                operations = await GetAppOperationsAsync(correlationId);
 
                 rules = await operations.CountryValidationRules.ByCountry(countryCode).GetAsync();
 
@@ -95,7 +95,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
                     { "ParternCenterCorrelationId", correlationId.ToString() }
                 };
 
-                this.service.Telemetry.TrackEvent("GetCountryValidationRulesAsync", eventProperties, eventMetrics);
+                service.Telemetry.TrackEvent("GetCountryValidationRulesAsync", eventProperties, eventMetrics);
 
                 return rules;
             }
@@ -114,7 +114,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
         /// <returns>An instance of <see cref="Customer"/> that represents the specified customer.</returns>
         public async Task<Customer> GetCustomerAsync(CustomerPrincipal principal)
         {
-            return await this.GetCustomerAsync(principal, principal.Operation.CustomerId);
+            return await GetCustomerAsync(principal, principal.Operation.CustomerId);
         }
 
         /// <summary>
@@ -145,9 +145,9 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
             {
                 startTime = DateTime.Now;
                 correlationId = Guid.NewGuid();
-                operations = await this.GetAppOperationsAsync(correlationId);
+                operations = await GetAppOperationsAsync(correlationId);
 
-                if (principal.CustomerId.Equals(this.service.Configuration.PartnerCenterApplicationTenantId))
+                if (principal.CustomerId.Equals(service.Configuration.PartnerCenterApplicationTenantId))
                 {
                     customer = await operations.Customers.ById(customerId).GetAsync();
                 }
@@ -170,7 +170,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
                     { "ParternCenterCorrelationId", correlationId.ToString() }
                 };
 
-                this.service.Telemetry.TrackEvent("GetCustomerAsync", eventProperties, eventMetrics);
+                service.Telemetry.TrackEvent("GetCustomerAsync", eventProperties, eventMetrics);
 
                 return customer;
             }
@@ -209,11 +209,11 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
             {
                 startTime = DateTime.Now;
                 correlationId = Guid.NewGuid();
-                operations = await this.GetAppOperationsAsync(correlationId);
+                operations = await GetAppOperationsAsync(correlationId);
 
                 customers = new List<Customer>();
 
-                if (principal.CustomerId.Equals(this.service.Configuration.PartnerCenterApplicationTenantId))
+                if (principal.CustomerId.Equals(service.Configuration.PartnerCenterApplicationTenantId))
                 {
                     seekCustomers = await operations.Customers.GetAsync();
                     customersEnumerator = operations.Enumerators.Customers.Create(seekCustomers);
@@ -460,6 +460,8 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
                 IPartnerCredentials credentials = await service.TokenManagement
                     .GetPartnerCenterAppOnlyCredentialsAsync(
                         $"{service.Configuration.ActiveDirectoryEndpoint}/{service.Configuration.PartnerCenterApplicationTenantId}");
+
+                PartnerService.Instance.ApplicationName = BotConstants.ApplicationName;
 
                 lock (appLock)
                 {
