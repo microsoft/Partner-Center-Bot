@@ -1,5 +1,5 @@
 {
-  "luis_schema_version": "2.0.0",
+  "luis_schema_version": "2.1.0",
   "versionId": "0.1",
   "name": "Partner-Center-Bot",
   "desc": "",
@@ -13,6 +13,9 @@
     },
     {
       "name": "None"
+    },
+    {
+      "name": "OfficeIssues"
     },
     {
       "name": "Question"
@@ -105,6 +108,21 @@
           "endPos": 55
         }
       ]
+    },
+    {
+      "text": "o365 issues",
+      "intent": "OfficeIssues",
+      "entities": []
+    },
+    {
+      "text": "office 365 issues",
+      "intent": "OfficeIssues",
+      "entities": []
+    },
+    {
+      "text": "are there any issues with office 365",
+      "intent": "OfficeIssues",
+      "entities": []
     }
   ]
 }

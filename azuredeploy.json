@@ -72,14 +72,14 @@
       "type": "string",
       "minLength": 1
     },
-    "keyVaultApplicationCertThumbprint": {
+    "keyVaultAppCertThumbprint": {
       "type": "string",
       "metadata": {
         "description": "Thumbprint for the certificate used to access Key Vault"
       },
       "minLength": 1
     },
-    "keyVaultApplicationId": {
+    "keyVaultAppId": {
       "type": "string",
       "metadata": {
         "description": "Identifier of the application used to access Key Vault"
@@ -104,6 +104,13 @@
     "keyVaultTenantId": {
       "type": "string",
       "minLength": 1
+    },
+    "luisAccountName": {
+      "type": "string",
+      "minLength": 3,
+      "metadata": {
+        "description": "Name of the cognitive service instance"
+      }
     },
     "luisAppId": {
       "type": "string",
@@ -195,6 +202,18 @@
     "storageAccountName": "[concat('storage', uniqueString(resourceGroup().id))]"
   },
   "resources": [
+    {
+      "type": "Microsoft.CognitiveServices/accounts",
+      "sku": {
+        "name": "F0"
+      },
+      "kind": "LUIS",
+      "name": "[parameters('luisAccountName')]",
+      "apiVersion": "2016-02-01-preview",
+      "location": "westus",
+      "properties": {},
+      "dependsOn": []
+    },
     {
       "type": "Microsoft.KeyVault/vaults",
       "name": "[parameters('keyVaultName')]",
@@ -380,8 +399,8 @@
             "InstrumentationKey": "[reference(concat('Microsoft.Insights/components/', parameters('siteName'))).InstrumentationKey]",
             "PartnerCenterApplicationId": "[parameters('partnerCenterApplicationId')]",
             "PartnerCenterApplicationTenantId": "[parameters('partnerCenterApplicationTenantId')]",
-            "VaultApplicationCertThumbprint": "[parameters('keyVaultApplicationCertThumbprint')]",
-            "VaultApplicationId": "[parameters('keyVaultApplicationId')]",
+            "VaultApplicationCertThumbprint": "[parameters('keyVaultAppCertThumbprint')]",
+            "VaultApplicationId": "[parameters('keyVaultAppId')]",
             "VaultApplicationTenantId": "[parameters('keyVaultTenantId')]",
             "VaultBaseAddress": "[concat('https://', parameters('keyVaultName'), '.vault.azure.net')]"
           }

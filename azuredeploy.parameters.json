@@ -17,13 +17,22 @@
     "branch": {
       "value": "master"
     },
+    "cacheSKUName": {
+      "value": "Basic"
+    },
+    "cacheSKUFamily": {
+      "value": "C"
+    },
+    "cacheSKUCapacity": {
+      "value": 0
+    },
     "hostingPlanName": {
       "value": ""
     },
-    "keyVaultApplicationCertThumbprint": {
+    "keyVaultAppCertThumbprint": {
       "value": ""
     },
-    "keyVaultApplicationId": {
+    "keyVaultAppId": {
       "value": ""
     },
     "keyVaultName": {
@@ -33,6 +42,18 @@
       "value": "Standard"
     },
     "keyVaultTenantId": {
+      "value": ""
+    },
+    "luisAppId": {
+      "value": ""
+    },
+    "luisApiKey": {
+      "value": ""
+    },
+    "microsoftAppId": {
+      "value": ""
+    },
+    "microsoftAppPassword": {
       "value": ""
     },
     "partnerCenterApplicationId": {

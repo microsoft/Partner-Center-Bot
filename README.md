@@ -1,8 +1,8 @@
 # Partner Center Bot
-This is a sample project that demonstrates how to leverage the Microsoft Bot framework to construct a bot that interacts with Partner Center. With this initial release limited
-features are supported. Additional abilities will be added over time. The intent of this project is not to provide a fully functional bot, but rather to demonstrate how this 
-technology can be utilize to support customers. Most customers want the ability to resolve issues on their own, and this sample provides you a tool that can help fulfill that
-desire.
+This is a sample project that demonstrates how to leverage the Microsoft Bot framework to construct a bot that interacts with 
+Partner Center. With this initial release limitedfeatures are supported. Additional abilities will be added over time. The 
+intent of this project is not to provide a fully functional bot, but rather to demonstrate how this technology can be utilized 
+to support customers. 
 
 This project is being provided with community support only. If you need help please
 log an issue using the [issue tracker](https://github.com/Microsoft/Partner-Center-Bot/issues).
@@ -20,7 +20,8 @@ This makes it where the user can get answers to commonly asked questions.
 ![Bot Interaction](docs/Images/bot02.png)
 
 ## Deployment
-Please review the [Deployment](docs/Deployment.md) guide for details on how to deploy this solution.
+Please follow the [deployment guide](docs/Deployment.md) to obtain the necessary information for the ARM template. 
+Once all the prerequisites have been fulfilled please click the *Deploy to Azure* button below to deploy the solution.
 
 [![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FMicrosoft%2FPartner-Center-Bot%2Fmaster%2Fazuredeploy.json)
 [![Visualize](http://armviz.io/visualizebutton.png)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FMicrosoft%2FPartner-Center-Bot%2Fmaster%2Fazuredeploy.json)

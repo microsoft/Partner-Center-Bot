@@ -1,37 +1,67 @@
 # Deployment 
 Deploying and configure the Partner Center Bot requires numerous configurations. This document will guide you through each of the
-configurations. If you need help please
-log an issue using the [issue tracker](https://github.com/Microsoft/Partner-Center-Bot/issues).
+configurations. If you need help please log an issue using the [issue tracker](https://github.com/Microsoft/Partner-Center-Bot/issues).
 
 ## Prerequisites 
-The following are _optional_ prerequisites for this project 
+The following are _required_ prerequisites in order to perform the steps outlined in this guide. 
 
-| Prerequisite          | Purpose                                                                                                       |
-|-----------------------|---------------------------------------------------------------------------------------------------------------|
-|  Azure Subscription   | A subscription is only required if you want to host the sample in Azure or utilize the various Azure services.|
+| Prerequisite                            | Purpose                                                                                 |
+|-----------------------------------------|-----------------------------------------------------------------------------------------|
+|  Azure AD global admin privileges       | Required to create the required Azure AD application utilized to obtain access tokens.  |
+|  Partner Center admin agent privileges  | Required to perform various Partner Center operations through the Partner Center API.   |
 
-The following are _required_ prerequisites for this project
+If you do not have the privileges then you will not able to perform the remaining operations in this guide.
 
-| Prerequisite                           | Purpose                                                                                      |
-|----------------------------------------|----------------------------------------------------------------------------------------------|
-|  Azure AD global admin privileges      | Required to create the required Azure AD application utilized to obtain access tokens.       |
-|  Partner Center admin agent privileges | Required to perform various Partner Center operations through the Partner Center API.        |
+## Azure Key Vault 
+Azure Key Vault is used to protect application secrets and connection strings. An instance of Key Vault will be deployed, 
+the following sections will walk you through the configurations that are not automated yet.  
 
-## Azure Key Vault
-Azure Key Vault is utilized by this project to protect application secrets and 
-various connection strings. It is not required that this service by deployed, 
-however, it is highly recommend that you utilize this service to protect this 
-sensitive information.
+### Create Certificate
+A certificate is utilized to obtain the required access token in order to interact with the vault. Perform 
+the following to create the certificate
 
-If you would like to utilize Azure Key Vault then please follows the steps outlined
-in the [Azure Key Vault](KeyVault.md) documentation.
+Modify the following PowerShell and then invoke it 
+
+```powershell
+$cert = New-SelfSignedCertificate -Subject "PartnerCenterBot" -CertStoreLocation Cert:CurrentUser -KeyExportPolicy Exportable -Type DocumentEncryptionCert -KeyUsage KeyEncipherment -KeySpec KeyExchange -KeyLength 2048 
+
+Export-Certificate -Cert $cert -FilePath C:\cert\bot.cer
+```
+
+### Create Azure AD Application 
+An Azure AD application is utilized to access the instance of Key Vault. This application is confiugred to 
+utilize the certificate that was created in the above step. Perform the following to create the and configure 
+the application
+
+1. Open PowerShell and install the [Azure PowerShell cmdlets](https://docs.microsoft.com/en-us/powershell/azureps-cmdlets-docs/)
+if you necessary
+2. Update the following cmdlets and then invoke them
+
+    ```powershell
+    Login-AzureRmAccount
+
+    ## Update these variable before invoking the rest of the cmdlets
+    $certFile = "C:\cert\bot.cer"
+    $identifierUri = "https://{0}/{1}" -f "tenant.onmicrosoft.com", [System.Guid]::NewGuid()
+    $resourceGroupName = "ResourceGroupName"
+
+    $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
+    $cert.Import($certFile)
+    $value = [System.Convert]::ToBase64String($cert.GetRawCertData())
+
+    $app = New-AzureRmADApplication -DisplayName "Partern Center Bot Vault App" -HomePage "https://localhost" -IdentifierUris $identifierUri -CertValue $value -EndDate $cert.NotAfter -StartDate $cert.NotBefore
+    $spn = New-AzureRmADServicePrincipal -ApplicationId $app.ApplicationId
+
+    # Get the certificate thumbprint value for the VaultApplicationCertThumbprint parameter
+    $cert.Thumbprint
+
+    # Get the application identifier that will be used to access the instance of Key Vault
+    $app.ApplicationId
+    ```
 
 ## Partner Center Azure AD Application
-App only authentication is utilized when performing various operations using the 
-Partner Center API. In order to obtain the necessary access token to perform 
-these operations an applicaiton needs to be registered in the Partner Center 
-portal. Perform the following to create, if necessary, and register the required 
-application
+The Partner Center API is utilized to verify the authenticated user belongs to a customer that 
+has a relationship with the configured partner. Perform the following to create the application 
 
 1. Login into the [Partner Center](https://partnercenter.microsoft.com) portal using credentials that have _AdminAgents_ and _Global Admin_ privileges
 2. Click _Dashboard_ -> _Account Settings_ -> _App Management_ 
@@ -42,14 +72,6 @@ application
 4. Document the _App ID_ and _Account ID_ values. Also, if necessary create a key and document that value. 
 
     ![Partner Center App](Images/appmgmt02.png)
-
-Now that the application has been registered in Partner Center you can update the 
-the related configurations for the project. Perform the following to configure the
-require settings 
-
-1. Set the _PartnerCenterApplicationId_ setting in the _web.config_ file to the _App ID_ value documented in step 4 above. 
-2. If you have deployed Azure Key Vault then add a new secret with name of _PartnerCenterApplicationSecret_. Configure the value to the key value that was obtained in step 4 above. If you have decided not to utilize Azure Key Vault then create a new application setting in the _web.config_ file with the name of _PartnerCenterApplicationSecret_ and set the value to key vaule obtained in step 4 above.
-3. Set the _PartnerCenterApplicationTenantId_ setting in the _web.config_ file to the _Account ID_ value documented in step 4 above.
 
 ## Creating the Bot Azure AD Application
 The bot requires an Azure AD application that grants privileges to Azure AD and the Microsoft Graph. Perform the following tasks to create and configure the application 
@@ -73,25 +95,85 @@ The bot requires an Azure AD application that grants privileges to Azure AD and 
 
 9. Enable pre-consent for this application by completing the steps outlined in the [Pre-consent](Preconsent.md) documentation.
 
+## Create a New LUIS Application
+Perform the following to create and configure the Language Understanding Intelligent Service (LUIS) application
+
+1. Browse to https://www.luis.ai/ and login using an appropriate account 
+2. Click the *Import App* button to import the [Partner-Center-Bot.json](../Partner-Center-Bot.json) file
+3. Train and publish the application. Be sure to document the application identifier and subscription key
+
+Please checkout [Publish your app](https://docs.microsoft.com/en-us/azure/cognitive-services/LUIS/publishapp) for more information.
+
+## Create a New Instance of the QnA Service 
+Perform the following in order to create a new instnace of the QnA service
+
+1. Browse to https://qnamaker.ai/ and login using an appropriate account
+2. Click the _Create new service_ link found at the top of the page
+3. Complete the form as necessary
+
+    ![New QnA Service](Images/qnaservice01.png)
+
+4. Click the _Create_ button at the bottom of the page to create the service
+5. Make any necessary modifications to the knowledge question and answer pairs
+6. Click the _Save and retrain_ button to apply any changes you made and then click the _Publish_ button
+7. Click the _Publish_ button and then document the knowledge base identifier and subscription key
+
+    ![New QnA Service](Images/qnaservice02.png)
+
 ## Register With the Bot Framework
 Registering the bot with the framework is how the connector service knows how to interact with the bot's web service. Perform the 
 following to register the bot and update the required configurations
 
 1. Go to the Microsoft Bot Framework portal at https://dev.botframework.com and sign in.
 2. Click the "Register a Bot" button and fill out the form. Be sure to document the application identifier and password that you generate as part of this registration. 
-3. Set the _BotId_ and _MicrosoftAppId_ settings, found in the _web.config_ accordingly
 
-    ```xml
-    <!-- Specify the identifer for the bot here -->
-    <add key="BotId" value="" />
-    <!-- Specify the Microsoft application identifier for the bot here -->
-    <add key="MicrosoftAppId" value="" />
-    ```
+## Deploy the ARM Template 
+An Azure Resource Manager (ARM) template has been developed in order to simplify the deployment of the solution. When you click the 
+*Deploy to Azure* below it will take you to a website where you can populate the parameters for the template. 
 
-4. If you have elected to utilize _Azure Key Vault_ then create a new secret with the name _MicrosoftAppPassword_ and set the value to the password generate in step 2. Otherwise, you will need to create a new setting in the _web.config_ that is similar to the following 
+[![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FMicrosoft%2FPartner-Center-Bot%2Fmaster%2Fazuredeploy.json)
+[![Visualize](http://armviz.io/visualizebutton.png)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FMicrosoft%2FPartner-Center-Bot%2Fmaster%2Fazuredeploy.json)
 
-    ```xml
-    <!-- Specify the Microsoft application password for the bot here -->
-    <add key="MicrosoftAppPasssword" value="" />
-    ```
+The following table provides details for the appropriate value for each of the parameters.
+
+| Parameter                             | Value                                                                                                    |
+|---------------------------------------|----------------------------------------------------------------------------------------------------------|
+| Application Id                        | Identifier for the application created in the Azure AD Application section                               |
+| Application Secret                    | Secret key create in the step 9 of the Azure AD application section                                      |
+| Application Tenant Id                 | Identifier for the tenant where the application from the Azure AD Application was created                |
+| Key Vault App Cert Thumbprint         | Thumbprint of the certificated created in the Azure Key Vault section                                    |
+| Key Vault App Id                      | Identifier for the Azure AD application created in the Azure Key Vault section                           |
+| Key Vault Name                        | Name for the Key Vault. This name should not contain any special characters or spaces                    |
+| Key Vault Tenant Id                   | Identifier for the tenant where the instance of Azure Key Vault is being created                         |
+| LUIS App Id                           | Identifier for the LUIS application created in the *Create a New LUIS Application* section               |
+| LUIS App Key                          | Key for the LUIS application created in the *Create a New LUIS Application* section                      |
+| Microsoft App Id                      | Identifier of the application created in the *Register With the Bot Framework* section                   |
+| Micorosoft App Password               | Password of the application created in the *Register With the Bot Framework* section                     |
+| Partner Center Application Id         | App ID value obtained from the Partner Center Azure AD Application section                               |
+| Partner Center Application Secret     | Key created in the Partner Center Azure AD Application section                                           | 
+| Partner Center Application Tenat Id   | Account ID value obtained from the Partner Center Azure AD Application section                           |
+| QnA Knowledgebase Id                  | Identifier for the knowledgebase created in the *Create a New Instance of the QnA Service* section       |
+| QnA Subscription Key                  | Subscription key for the knowledgebase created in the *Create a New Instance of the QnA Service* section |
+
+## Configure Azure Key Vault Access Policy
+Now that the instance of Azure Key Vault has been provisioned you can add the access policy that will 
+enable the Azure AD application the ability to create, delete, and read secrets. Perform the following 
+to create the access policy
+
+1. Open PowerShell and install the [Azure AD PowerShell cmdlets](https://docs.microsoft.com/en-us/powershell/azure/install-adv2?view=azureadps-2.0)
+if you necessary
+2. Update the following cmdlets and then invoke them
+
+    ```powershell
+    Connect-AzureAD
+    Login-AzureRmAccount
+
+    ## Update these variable before invoking the rest of the cmdlets
+
+    # The value for the AppId should be the application identifier for the Azure AD application created for Key Vault
+    $spn = Get-AzureADServicePrincipal | ? {$_.AppId -eq 'b6b84568-6c01-4981-a80f-09da9a20bbed'}
+    $resourceGroupName = "ResourceGroupName"
+    $vaultName = "VaultName"
+
+    Set-AzureRmKeyVaultAccessPolicy -VaultName $vaultName -ObjectId $spn.Id -PermissionsToSecrets delete,get,set -ResourceGroupName $resourceGroupName
     ```

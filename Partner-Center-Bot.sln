@@ -22,9 +22,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{BAD9B155-1
 	ProjectSection(SolutionItems) = preProject
 		docs\AddingIntents.md = docs\AddingIntents.md
 		docs\Deployment.md = docs\Deployment.md
-		docs\KeyVault.md = docs\KeyVault.md
 		docs\Preconsent.md = docs\Preconsent.md
-		docs\QnAMaker.md = docs\QnAMaker.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{B55A743C-BA04-491F-9C64-E7339C30684F}"
