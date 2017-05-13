@@ -11,10 +11,8 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using Forms;
     using Logic;
     using Microsoft.Bot.Builder.Dialogs;
-    using Microsoft.Bot.Builder.FormFlow;
     using Microsoft.Bot.Builder.Luis;
     using Microsoft.Bot.Builder.Luis.Models;
     using Microsoft.Bot.Connector;
