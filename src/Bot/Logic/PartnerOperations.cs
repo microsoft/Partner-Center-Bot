@@ -453,7 +453,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
         /// </summary>
         /// <param name="correlationId">Correlation identifier for the operation.</param>
         /// <returns>An instance of the partner service.</returns>
-        private async ValueTask<IPartner> GetAppOperationsAsync(Guid correlationId)
+        private async Task<IPartner> GetAppOperationsAsync(Guid correlationId)
         {
             if (appOperations == null || appOperations.Credentials.ExpiresAt > DateTime.UtcNow)
             {
