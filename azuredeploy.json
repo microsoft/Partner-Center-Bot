@@ -28,7 +28,8 @@
       "minLength": 1
     },
     "branch": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "master"
     },
     "cacheSKUName": {
       "type": "string",
@@ -87,7 +88,7 @@
     },
     "keyVaultName": {
       "type": "string",
-      "minLength": 1
+      "minLength": 3
     },
     "keyVaultSkuName": {
       "type": "string",
@@ -141,7 +142,8 @@
       "minLength": 1
     },
     "repoUrl": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "https://github.com/Microsoft/Partner-Center-Bot.git"
     },
     "siteName": {
       "type": "string",
