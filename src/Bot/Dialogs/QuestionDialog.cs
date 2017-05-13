@@ -7,6 +7,7 @@
 namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
 {
     using System;
+    using System.Linq;
     using System.Threading.Tasks;
     using Logic;
     using Microsoft.Bot.Builder.CognitiveServices.QnAMaker;
@@ -32,7 +33,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
         {
             service.AssertNotNull(nameof(service));
 
-            this.QnAService = new QnAMakerService(new QnAMakerAttribute(
+            QnAService = new QnAMakerService(new QnAMakerAttribute(
                 service.Configuration.QnASubscriptionKey,
                 service.Configuration.QnAKnowledgebaseId,
                 "default message",
@@ -53,7 +54,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
         {
             context.AssertNotNull(nameof(context));
 
-            context.Wait(this.MessageReceivedAsync);
+            context.Wait(MessageReceivedAsync);
         }
 #pragma warning restore 1998
 
@@ -71,7 +72,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
         public async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> argument)
         {
             IMessageActivity message;
-            QnAMakerResult result = null;
+            QnAMakerResults result = null;
 
             context.AssertNotNull(nameof(context));
             argument.AssertNotNull(nameof(argument));
@@ -82,11 +83,11 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
 
                 if (!string.IsNullOrEmpty(message?.Text))
                 {
-                    result = await this.QnAService.QueryServiceAsync(message.Text);
+                    result = await QnAService.QueryServiceAsync(message.Text);
                 }
 
                 message = context.MakeMessage();
-                message.Text = result == null ? Resources.RewordQuestion : result.Answer;
+                message.Text = result == null ? Resources.RewordQuestion : result.Answers.First().Answer;
 
                 context.Done(message);
             }

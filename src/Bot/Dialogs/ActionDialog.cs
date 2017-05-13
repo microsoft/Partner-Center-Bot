@@ -11,8 +11,10 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using Forms;
     using Logic;
     using Microsoft.Bot.Builder.Dialogs;
+    using Microsoft.Bot.Builder.FormFlow;
     using Microsoft.Bot.Builder.Luis;
     using Microsoft.Bot.Builder.Luis.Models;
     using Microsoft.Bot.Connector;
@@ -82,7 +84,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
                 }
 
                 await context.PostAsync(message);
-                context.Wait(this.MessageReceived);
+                context.Wait(MessageReceived);
             }
             finally
             {
@@ -113,22 +115,22 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
             {
                 key = result.TopScoringIntent.Intent.ToCamelCase();
 
-                principal = await context.GetCustomerPrincipalAsync(this.service);
+                principal = await context.GetCustomerPrincipalAsync(service);
 
                 if (principal == null)
                 {
-                    await this.HelpAsync(context);
+                    await HelpAsync(context);
                     return;
                 }
 
                 if (principal.AvailableIntents.ContainsKey(key))
                 {
                     await principal.AvailableIntents[key]
-                        .ExecuteAsync(context, message, result, this.service);
+                        .ExecuteAsync(context, message, result, service);
                 }
                 else
                 {
-                    await this.HelpAsync(context);
+                    await HelpAsync(context);
                 }
             }
             finally
@@ -154,14 +156,14 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
                 if (message.Text.Equals(Resources.Login, StringComparison.CurrentCultureIgnoreCase))
                 {
                     await context.Forward(
-                        new AuthDialog(this.service, message),
-                        this.ResumeAfterAuth,
+                        new AuthDialog(service, message),
+                        ResumeAfterAuth,
                         message,
                         CancellationToken.None);
                 }
                 else if (message.Text.Equals(Resources.Help, StringComparison.CurrentCultureIgnoreCase))
                 {
-                    await this.HelpAsync(context);
+                    await HelpAsync(context);
                 }
                 else
                 {
@@ -183,7 +185,8 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
         /// <exception cref="ArgumentNullException">
         /// <paramref name="context"/> is null.
         /// or
-        /// <paramref name="result"/> is null.</exception>
+        /// <paramref name="result"/> is null.
+        /// </exception>
         private async Task ResumeAfterAuth(IDialogContext context, IAwaitable<string> result)
         {
             context.AssertNotNull(nameof(context));
@@ -192,7 +195,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
             string message = await result;
             await context.PostAsync(message);
 
-            await this.HelpAsync(context);
+            await HelpAsync(context);
         }
     }
 }

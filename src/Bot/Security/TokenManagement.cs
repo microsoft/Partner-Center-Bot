@@ -74,7 +74,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
 
                 authResult = await authContext.AcquireTokenSilentAsync(
                     resource,
-                    this.service.Configuration.ApplicationId,
+                    service.Configuration.ApplicationId,
                     objectUserId);
 
                 return authResult;
@@ -107,9 +107,9 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
 
             try
             {
-                if (this.service.Cache.IsEnabled)
+                if (service.Cache.IsEnabled)
                 {
-                    tokenCache = new DistributedTokenCache(this.service, resource, $"AppOnly::{resource}");
+                    tokenCache = new DistributedTokenCache(service, resource, $"AppOnly::{resource}");
                     authContext = new AuthenticationContext(authority, tokenCache);
                 }
                 else
@@ -120,8 +120,8 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
                 authResult = await authContext.AcquireTokenAsync(
                     resource,
                     new ClientCredential(
-                        this.service.Configuration.ApplicationId,
-                        this.service.Configuration.ApplicationSecret));
+                        service.Configuration.ApplicationId,
+                        service.Configuration.ApplicationSecret));
 
                 return new AuthenticationToken(authResult.AccessToken, authResult.ExpiresOn);
             }
@@ -158,12 +158,12 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
             {
                 authContext = new AuthenticationContext(authority);
 
-                certificate = FindCertificateByThumbprint(this.service.Configuration.VaultApplicationCertThumbprint);
+                certificate = FindCertificateByThumbprint(service.Configuration.VaultApplicationCertThumbprint);
 
                 authResult = await authContext.AcquireTokenAsync(
                     resource,
                     new ClientAssertionCertificate(
-                        this.service.Configuration.VaultApplicationId,
+                        service.Configuration.VaultApplicationId,
                         certificate));
 
                 return authResult.AccessToken;
@@ -206,9 +206,9 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
             {
                 key = $"AppPlusUser::{resource}::{principal.ObjectId}";
 
-                if (this.service.Cache.IsEnabled)
+                if (service.Cache.IsEnabled)
                 {
-                    tokenCache = new DistributedTokenCache(this.service, resource, key);
+                    tokenCache = new DistributedTokenCache(service, resource, key);
                     authContext = new AuthenticationContext(authority, tokenCache);
                 }
                 else
@@ -221,21 +221,21 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
                     authResult = await authContext.AcquireTokenAsync(
                         resource,
                         new ClientCredential(
-                            this.service.Configuration.ApplicationId,
-                            this.service.Configuration.ApplicationSecret),
+                            service.Configuration.ApplicationId,
+                            service.Configuration.ApplicationSecret),
                         new UserAssertion(principal.AccessToken, AssertionType));
                 }
                 catch (AdalServiceException ex)
                 {
                     if (ex.ErrorCode.Equals("AADSTS70002", StringComparison.CurrentCultureIgnoreCase))
                     {
-                        await this.service.Cache.DeleteAsync(CacheDatabaseType.Authentication, key);
+                        await service.Cache.DeleteAsync(CacheDatabaseType.Authentication, key);
 
                         authResult = await authContext.AcquireTokenAsync(
                             resource,
                             new ClientCredential(
-                                this.service.Configuration.ApplicationId,
-                                this.service.Configuration.ApplicationSecret),
+                                service.Configuration.ApplicationId,
+                                service.Configuration.ApplicationSecret),
                             new UserAssertion(principal.AccessToken, AssertionType));
                     }
                     else
@@ -285,7 +285,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
 
                 authUri = await authContext.GetAuthorizationRequestUrlAsync(
                     resource,
-                    this.service.Configuration.ApplicationId,
+                    service.Configuration.ApplicationId,
                     redirectUri,
                     UserIdentifier.AnyUser,
                     extraQueryParameters);
@@ -315,7 +315,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
 
             // Attempt to obtain the Partner Center token from the cache.
             IPartnerCredentials credentials =
-                 await this.service.Cache.FetchAsync<PartnerCenterTokenModel>(
+                 await service.Cache.FetchAsync<PartnerCenterTokenModel>(
                      CacheDatabaseType.Authentication, BotConstants.PartnerCenterAppOnlyKey);
 
             if (credentials != null && !credentials.IsExpired())
@@ -325,11 +325,11 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
 
             // The access token has expired, so a new one must be requested.
             credentials = await PartnerCredentials.Instance.GenerateByApplicationCredentialsAsync(
-                this.service.Configuration.PartnerCenterApplicationId,
-                this.service.Configuration.PartnerCenterApplicationSecret,
-                this.service.Configuration.PartnerCenterApplicationTenantId);
+                service.Configuration.PartnerCenterApplicationId,
+                service.Configuration.PartnerCenterApplicationSecret,
+                service.Configuration.PartnerCenterApplicationTenantId);
 
-            await this.service.Cache.StoreAsync(
+            await service.Cache.StoreAsync(
                 CacheDatabaseType.Authentication, BotConstants.PartnerCenterAppOnlyKey, credentials);
 
             return credentials;
@@ -357,7 +357,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
             string key = $"AppPlusUser::PartnerCenter::{principal.ObjectId}";
 
             IPartnerCredentials credentials =
-                 await this.service.Cache.FetchAsync<PartnerCenterTokenModel>(
+                 await service.Cache.FetchAsync<PartnerCenterTokenModel>(
                      CacheDatabaseType.Authentication, key);
 
             if (credentials != null && !credentials.IsExpired())
@@ -365,15 +365,15 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
                 return credentials;
             }
 
-            AuthenticationToken token = await this.GetAppPlusUserTokenAsync(
+            AuthenticationToken token = await GetAppPlusUserTokenAsync(
                 principal,
                  authority,
-                 this.service.Configuration.PartnerCenterEndpoint);
+                 service.Configuration.PartnerCenterEndpoint);
 
             credentials = await PartnerCredentials.Instance.GenerateByUserCredentialsAsync(
-                this.service.Configuration.PartnerCenterApplicationId, token);
+                service.Configuration.PartnerCenterApplicationId, token);
 
-            await this.service.Cache.StoreAsync(
+            await service.Cache.StoreAsync(
                CacheDatabaseType.Authentication, key, credentials);
 
             return credentials;
@@ -414,8 +414,8 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
                     code,
                     redirectUri,
                     new ClientCredential(
-                        this.service.Configuration.ApplicationId,
-                        this.service.Configuration.ApplicationSecret),
+                        service.Configuration.ApplicationId,
+                        service.Configuration.ApplicationSecret),
                     resource);
             }
             finally

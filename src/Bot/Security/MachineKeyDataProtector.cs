@@ -48,7 +48,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
             try
             {
                 buffer = Encoding.ASCII.GetBytes(data);
-                return Convert.ToBase64String(MachineKey.Protect(buffer, this.purposes));
+                return Convert.ToBase64String(MachineKey.Protect(buffer, purposes));
             }
             finally
             {
@@ -74,7 +74,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
             try
             {
                 buffer = Convert.FromBase64String(data);
-                decrypt = MachineKey.Unprotect(buffer, this.purposes);
+                decrypt = MachineKey.Unprotect(buffer, purposes);
 
                 if (decrypt == null)
                 {

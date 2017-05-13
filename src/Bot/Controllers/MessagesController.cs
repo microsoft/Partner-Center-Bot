@@ -47,6 +47,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
         [Route("")]
         public async Task<HttpResponseMessage> PostAsync([FromBody]Activity activity)
         {
+            ConnectorClient client;
             DateTime startTime;
             Dictionary<string, double> eventMeasurements;
             Dictionary<string, string> eventProperties;
@@ -55,9 +56,23 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
             {
                 startTime = DateTime.Now;
 
+                if (activity.Type == ActivityTypes.ConversationUpdate)
+                {
+                    if (activity.MembersAdded.Any(o => o.Id == activity.Recipient.Id))
+                    {
+                        client = new ConnectorClient(
+                            new Uri(activity.ServiceUrl),
+                            new MicrosoftAppCredentials(
+                                Service.Configuration.MicrosoftAppId,
+                                Service.Configuration.MicrosoftAppPassword));
+
+                        await client.Conversations.ReplyToActivityAsync(activity.CreateReply(Resources.Welcome));
+                    }
+                }
+
                 if (activity.Type == ActivityTypes.Message)
                 {
-                    await Conversation.SendAsync(activity, () => new ActionDialog(this.Service));
+                    await Conversation.SendAsync(activity, () => new ActionDialog(Service));
                 }
 
                 // Capture the request for the customer summary for analysis.
@@ -74,12 +89,13 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
                     { "ElapsedMilliseconds", DateTime.Now.Subtract(startTime).TotalMilliseconds }
                 };
 
-                this.Service.Telemetry.TrackEvent("api/messages", eventProperties, eventMeasurements);
+                Service.Telemetry.TrackEvent("api/messages", eventProperties, eventMeasurements);
 
                 return new HttpResponseMessage(HttpStatusCode.Accepted);
             }
             finally
             {
+                client = null;
                 eventMeasurements = null;
                 eventProperties = null;
             }

@@ -120,14 +120,26 @@
   <data name="AuthenticationSuccessDoneMessage" xml:space="preserve">
     <value>こんにちは {0}!どうしたいですか。</value>
   </data>
+  <data name="CustomerContext" xml:space="preserve">
+    <value>よう顧客のコンテキストに設定します。</value>
+  </data>
   <data name="DataProtectionUnprotectException" xml:space="preserve">
     <value>指定されたデータの保護を解除できませんでした。</value>
+  </data>
+  <data name="Help" xml:space="preserve">
+    <value>ヘルプ</value>
   </data>
   <data name="HelpMessage" xml:space="preserve">
     <value>私は、次の方法でやり取りすることができます。</value>
   </data>
   <data name="InvalidAuthenticationException" xml:space="preserve">
     <value>認証要求が無効でした。問題が持続する場合、再度認証をしようとサポートに問い合わせてください。</value>
+  </data>
+  <data name="InvalidCustomerContextException" xml:space="preserve">
+    <value>この操作を行う前に顧客を選択する必要があります。入力してください * * 顧客リスト * *、顧客を選択し、もう一度やり直して。</value>
+  </data>
+  <data name="InvalidSubscriptionContextException" xml:space="preserve">
+    <value>この操作を試行する前にサブスクリプションを選択する必要があります。入力してください * * リスト サブスクリプション * *、サブスクリプションを選択して、もう一度やり直して。</value>
   </data>
   <data name="ListCustomersHelpMessage" xml:space="preserve">
     <value>顧客リスト</value>
@@ -136,7 +148,7 @@
     <value>リスト</value>
   </data>
   <data name="ListSubscriptionssHelpMessage" xml:space="preserve">
-    <value>サブスクリプション</value>
+    <value>リストの購読</value>
   </data>
   <data name="Login" xml:space="preserve">
     <value>ログイン</value>
@@ -150,11 +162,32 @@
   <data name="NotAuthenticatedHelpMessage" xml:space="preserve">
     <value>まず私と対話する前にログイン。入力してください * * ログイン * * を認証します。あなたはまだ型を助ける必要がある場合 * * ヘルプ * * 正常に認証した後。</value>
   </data>
+  <data name="OfficeIssuesHelpMessage" xml:space="preserve">
+    <value>求める Office 365 で任意の問題はありますか?</value>
+  </data>
+  <data name="QuestionHelpMessage" xml:space="preserve">
+    <value>EMS などの質問?</value>
+  </data>
   <data name="RedisCacheConnectionException" xml:space="preserve">
     <value>指定したインスタンスへの接続に失敗しました。</value>
   </data>
+  <data name="RewordQuestion" xml:space="preserve">
+    <value>あなたの質問の言い回しを変更して、もう一度やり直してください。</value>
+  </data>
+  <data name="SelectCaptial" xml:space="preserve">
+    <value>選択します。</value>
+  </data>
+  <data name="ServiceInitializedException" xml:space="preserve">
+    <value>ボット サービスが初期化された後、この関数を呼び出すことはできません。</value>
+  </data>
   <data name="SigninCardText" xml:space="preserve">
     <value>ログインには、下のボタンをクリックしてください。</value>
+  </data>
+  <data name="SubscriptionContext" xml:space="preserve">
+    <value>ようサブスクリプションのコンテキストに設定します。</value>
+  </data>
+  <data name="SubscriptionRequestMessage" xml:space="preserve">
+    <value>ここでは、{0} のサブスクリプション</value>
   </data>
   <data name="SuccessfulAuthentication" xml:space="preserve">
     <value>正常に認証!お気軽にこのウィンドウを閉じるし、ボットに話し続けます。</value>
@@ -162,34 +195,16 @@
   <data name="UnableToLocateCustomer" xml:space="preserve">
     <value>選択した顧客を見つけることができません。入力してください * * 顧客リスト * * もう一度やり直してください。</value>
   </data>
-  <data name="Help" xml:space="preserve">
-    <value>ヘルプ</value>
-  </data>
-  <data name="RewordQuestion" xml:space="preserve">
-    <value>あなたの質問の言い回しを変更して、もう一度やり直してください。</value>
-  </data>
-  <data name="InvalidCustomerContextException" xml:space="preserve">
-    <value>この操作を行う前に顧客を選択する必要があります。入力してください * * 顧客リスト * *、顧客を選択し、もう一度やり直して。</value>
-  </data>
-  <data name="SubscriptionRequestMessage" xml:space="preserve">
-    <value>ここでは、{0} のサブスクリプション</value>
-  </data>
-  <data name="ServiceInitializedException" xml:space="preserve">
-    <value>ボット サービスが初期化された後、この関数を呼び出すことはできません。</value>
-  </data>
-  <data name="CustomerContext" xml:space="preserve">
-    <value>よう顧客のコンテキストに設定します。</value>
-  </data>
-  <data name="SelectCaptial" xml:space="preserve">
-    <value>選択します。</value>
-  </data>
-  <data name="SubscriptionContext" xml:space="preserve">
-    <value>ようサブスクリプションのコンテキストに設定します。</value>
-  </data>
   <data name="UnableToLocateSubscription" xml:space="preserve">
     <value>選択したサブスクリプションが見つかりません。入力してください * * サブスクリプションを一覧表示 * * もう一度やり直してください。</value>
   </data>
   <data name="Welcome" xml:space="preserve">
     <value>パートナー センター ボットへようこそ。まず私と対話する前にログイン。入力してください * * ログイン * * を認証します。あなたはまだ型を助ける必要がある場合 * * ヘルプ * * 正常に認証した後。</value>
+  </data>
+  <data name="ErrorMessage" xml:space="preserve">
+    <value>この要求を満たすから私を妨げている問題をするようです。もう一度やり直してください。</value>
+  </data>
+  <data name="SelectCustomerFirst" xml:space="preserve">
+    <value>この操作を行う前に顧客を選択する必要があります。送信してください * * リストお客様 * *、顧客を選択して、もう一度やり直して。</value>
   </data>
 </root>

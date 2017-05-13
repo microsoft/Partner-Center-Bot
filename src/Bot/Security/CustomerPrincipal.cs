@@ -60,8 +60,8 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
         /// </summary>
         public OperationContext Operation
         {
-            get { return this.operationContext ?? (this.operationContext = new OperationContext()); }
-            set { this.operationContext = value; }
+            get { return operationContext ?? (operationContext = new OperationContext()); }
+            set { operationContext = value; }
         }
 
         /// <summary>

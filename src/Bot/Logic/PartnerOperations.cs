@@ -10,6 +10,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using PartnerCenter.Enumerators;
+    using PartnerCenter.Exceptions;
     using PartnerCenter.Models;
     using PartnerCenter.Models.CountryValidationRules;
     using PartnerCenter.Models.Customers;
@@ -244,7 +245,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
                     { "ParternCenterCorrelationId", correlationId.ToString() }
                 };
 
-                this.service.Telemetry.TrackEvent("GetCustomersAsync", eventProperties, eventMetrics);
+                service.Telemetry.TrackEvent("GetCustomersAsync", eventProperties, eventMetrics);
 
                 return customers;
             }
@@ -277,14 +278,14 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
 
             try
             {
-                if (this.service.Initialized)
+                if (service.Initialized)
                 {
                     throw new InvalidOperationException(Resources.ServiceInitializedException);
                 }
 
                 startTime = DateTime.Now;
                 correlationId = Guid.NewGuid();
-                operations = await this.GetAppOperationsAsync(correlationId);
+                operations = await GetAppOperationsAsync(correlationId);
 
                 profile = await operations.Profiles.LegalBusinessProfile.GetAsync();
 
@@ -300,9 +301,80 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
                     { "ParternCenterCorrelationId", correlationId.ToString() }
                 };
 
-                this.service.Telemetry.TrackEvent("GetLegalBusinessProfileAsync", eventProperties, eventMetrics);
+                service.Telemetry.TrackEvent("GetLegalBusinessProfileAsync", eventProperties, eventMetrics);
 
                 return profile;
+            }
+            finally
+            {
+                eventMetrics = null;
+                eventProperties = null;
+                operations = null;
+            }
+        }
+
+        /// <summary>
+        /// Gets the specified subscription.
+        /// </summary>
+        /// <param name="principal">Security principal for the calling user.</param>
+        /// <returns>An instance of <see cref="Subscription"/> that represents the specified subscription.</returns>
+        /// <exception cref="ArgumentException">
+        /// The operation context from <paramref name="principal"/> does not contain a valid customer identifier.
+        /// or
+        /// The operation context from <paramref name="principal"/> does not contain a valid subscription identifier.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="principal"/> is null.
+        /// </exception>
+        public async Task<Subscription> GetSubscriptionAsync(CustomerPrincipal principal)
+        {
+            DateTime startTime;
+            Dictionary<string, double> eventMetrics;
+            Dictionary<string, string> eventProperties;
+            Guid correlationId;
+            IPartner operations;
+            Subscription subscription = null;
+
+            principal.AssertNotNull(nameof(principal));
+            principal.Operation.CustomerId.AssertNotEmpty(nameof(principal.Operation.CustomerId));
+            principal.Operation.SubscriptionId.AssertNotEmpty(nameof(principal.Operation.SubscriptionId));
+
+            try
+            {
+                startTime = DateTime.Now;
+                correlationId = Guid.NewGuid();
+                operations = await GetAppOperationsAsync(correlationId);
+
+                try
+                {
+                    subscription = await operations.Customers.ById(principal.Operation.CustomerId)
+                        .Subscriptions.ById(principal.Operation.SubscriptionId).GetAsync();
+                }
+                catch (PartnerException ex)
+                {
+                    if (ex.ErrorCategory != PartnerErrorCategory.NotFound)
+                    {
+                        throw;
+                    }
+                }
+
+                // Track the event measurements for analysis.
+                eventMetrics = new Dictionary<string, double>
+                {
+                    { "ElapsedMilliseconds", DateTime.Now.Subtract(startTime).TotalMilliseconds }
+                };
+
+                // Capture the request for the customer summary for analysis.
+                eventProperties = new Dictionary<string, string>
+                {
+                    { "CustomerId", principal.CustomerId },
+                    { "ObjectId", principal.ObjectId },
+                    { "ParternCenterCorrelationId", correlationId.ToString() }
+                };
+
+                service.Telemetry.TrackEvent("GetSubscriptionAsync", eventProperties, eventMetrics);
+
+                return subscription;
             }
             finally
             {
@@ -335,9 +407,9 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
             {
                 startTime = DateTime.Now;
                 correlationId = Guid.NewGuid();
-                operations = await this.GetAppOperationsAsync(correlationId);
+                operations = await GetAppOperationsAsync(correlationId);
 
-                if (principal.CustomerId.Equals(this.service.Configuration.PartnerCenterApplicationTenantId))
+                if (principal.CustomerId.Equals(service.Configuration.PartnerCenterApplicationTenantId))
                 {
                     principal.AssertValidCustomerContext(Resources.InvalidCustomerContextException);
                     subscriptions = await operations.Customers.ById(principal.Operation.CustomerId).Subscriptions.GetAsync();
@@ -362,7 +434,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
                     { "ParternCenterCorrelationId", correlationId.ToString() }
                 };
 
-                this.service.Telemetry.TrackEvent("GetCustomersAsync", eventProperties, eventMetrics);
+                service.Telemetry.TrackEvent("GetCustomersAsync", eventProperties, eventMetrics);
 
                 return new List<Subscription>(subscriptions.Items);
             }
@@ -383,19 +455,19 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
         /// <returns>An instance of the partner service.</returns>
         private async ValueTask<IPartner> GetAppOperationsAsync(Guid correlationId)
         {
-            if (this.appOperations == null || this.appOperations.Credentials.ExpiresAt > DateTime.UtcNow)
+            if (appOperations == null || appOperations.Credentials.ExpiresAt > DateTime.UtcNow)
             {
-                IPartnerCredentials credentials = await this.service.TokenManagement
+                IPartnerCredentials credentials = await service.TokenManagement
                     .GetPartnerCenterAppOnlyCredentialsAsync(
-                        $"{this.service.Configuration.ActiveDirectoryEndpoint}/{this.service.Configuration.PartnerCenterApplicationTenantId}");
+                        $"{service.Configuration.ActiveDirectoryEndpoint}/{service.Configuration.PartnerCenterApplicationTenantId}");
 
-                lock (this.appLock)
+                lock (appLock)
                 {
-                    this.appOperations = PartnerService.Instance.CreatePartnerOperations(credentials);
+                    appOperations = PartnerService.Instance.CreatePartnerOperations(credentials);
                 }
             }
 
-            return this.appOperations.With(RequestContextFactory.Instance.Create(correlationId));
+            return appOperations.With(RequestContextFactory.Instance.Create(correlationId));
         }
     }
 }

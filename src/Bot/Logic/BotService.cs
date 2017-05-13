@@ -14,6 +14,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
     using Intents;
     using Microsoft.Bot.Builder.Dialogs;
     using Microsoft.Bot.Connector;
+    using Office;
     using Security;
     using Telemetry;
 
@@ -53,6 +54,11 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
         /// Provides the ability to perform various partner operations.
         /// </summary>
         private static IPartnerOperations partnerOperations;
+
+        /// <summary>
+        /// Provides the ability to communicate with the Office 365 Service Communications API.
+        /// </summary>
+        private static IServiceCommunications serviceCommunications;
 
         /// <summary>
         /// Provides the ability to track telemetry data.
@@ -100,6 +106,11 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
         public IPartnerOperations PartnerOperations => partnerOperations ?? (partnerOperations = new PartnerOperations(this));
 
         /// <summary>
+        /// Gets the ability to communicate with the Office 365 Service Communications API.
+        /// </summary>
+        public IServiceCommunications ServiceCommunications => serviceCommunications ?? (serviceCommunications = new ServiceCommunications(this));
+
+        /// <summary>
         /// Gets the telemetry service reference.
         /// </summary>
         public ITelemetryProvider Telemetry
@@ -111,7 +122,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
                     return telemetry;
                 }
 
-                if (string.IsNullOrEmpty(this.Configuration.InstrumentationKey))
+                if (string.IsNullOrEmpty(Configuration.InstrumentationKey))
                 {
                     telemetry = new EmptyTelemetryProvider();
                 }
@@ -157,8 +168,8 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
                 builder.Register(c =>
                 {
                     return new MicrosoftAppCredentials(
-                        this.Configuration.MicrosoftAppId,
-                        this.Configuration.MicrosoftAppPassword);
+                        Configuration.MicrosoftAppId,
+                        Configuration.MicrosoftAppPassword);
                 }).SingleInstance();
 
 #pragma warning disable 0618

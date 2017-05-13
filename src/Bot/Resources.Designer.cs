@@ -88,6 +88,15 @@ namespace Microsoft.Store.PartnerCenter.Bot {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There appears to be an issue preventing me from fulfilling this request. Please try again later.
+        /// </summary>
+        internal static string ErrorMessage {
+            get {
+                return ResourceManager.GetString("ErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to help.
         /// </summary>
         internal static string Help {
@@ -124,6 +133,15 @@ namespace Microsoft.Store.PartnerCenter.Bot {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You must select a subscription before attempting this operation. Please type ** list subscriptions**, select a subscription, and then try again..
+        /// </summary>
+        internal static string InvalidSubscriptionContextException {
+            get {
+                return ResourceManager.GetString("InvalidSubscriptionContextException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to list customers.
         /// </summary>
         internal static string ListCustomersHelpMessage {
@@ -142,7 +160,7 @@ namespace Microsoft.Store.PartnerCenter.Bot {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to subscriptions.
+        ///   Looks up a localized string similar to list subscriptions.
         /// </summary>
         internal static string ListSubscriptionssHelpMessage {
             get {
@@ -187,6 +205,24 @@ namespace Microsoft.Store.PartnerCenter.Bot {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ask are there any issues with Office 365?.
+        /// </summary>
+        internal static string OfficeIssuesHelpMessage {
+            get {
+                return ResourceManager.GetString("OfficeIssuesHelpMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ask questions such as what is EMS?.
+        /// </summary>
+        internal static string QuestionHelpMessage {
+            get {
+                return ResourceManager.GetString("QuestionHelpMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to connect to the specified instance..
         /// </summary>
         internal static string RedisCacheConnectionException {
@@ -210,6 +246,15 @@ namespace Microsoft.Store.PartnerCenter.Bot {
         internal static string SelectCaptial {
             get {
                 return ResourceManager.GetString("SelectCaptial", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must select a customer before attempting this operation. Please send **list customers**, select a customer, and then try again..
+        /// </summary>
+        internal static string SelectCustomerFirst {
+            get {
+                return ResourceManager.GetString("SelectCustomerFirst", resourceCulture);
             }
         }
         

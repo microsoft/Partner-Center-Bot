@@ -24,7 +24,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
         /// <summary>
         /// Gets the message to be displayed when help has been requested.
         /// </summary>
-        public string HelpMessage => string.Empty;
+        public string HelpMessage => Resources.QuestionHelpMessage;
 
         /// <summary>
         /// Gets the name of the intent.
@@ -34,7 +34,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
         /// <summary>
         /// Gets the permissions required to perform the operation represented by this intent.
         /// </summary>
-        public UserRoles Permissions => UserRoles.AdminAgents;
+        public UserRoles Permissions => UserRoles.Any;
 
         /// <summary>
         /// Performs the operation represented by this intent.

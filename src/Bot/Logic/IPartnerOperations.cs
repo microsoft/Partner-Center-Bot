@@ -57,6 +57,13 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
         Task<LegalBusinessProfile> GetLegalBusinessProfileAsync();
 
         /// <summary>
+        /// Gets the specified subscription.
+        /// </summary>
+        /// <param name="principal">Security principal for the calling user.</param>
+        /// <returns>An instance of <see cref="Subscription"/> that represents the specified subscription.</returns>
+        Task<Subscription> GetSubscriptionAsync(CustomerPrincipal principal);
+
+        /// <summary>
         /// Gets the available subscriptions.
         /// </summary>
         /// <param name="principal">Security principal for the calling user.</param>

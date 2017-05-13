@@ -49,7 +49,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
             message.AssertNotNull(nameof(message));
 
             this.service = service;
-            this.conversationReference = message.ToConversationReference();
+            conversationReference = message.ToConversationReference();
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
         public async Task StartAsync(IDialogContext context)
         {
             context.AssertNotNull(nameof(context));
-            await this.AuthenticateAsync(context);
+            await AuthenticateAsync(context);
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
                 }
                 else
                 {
-                    context.Wait(this.MessageReceivedAsync);
+                    context.Wait(MessageReceivedAsync);
                 }
             }
             finally
@@ -115,12 +115,12 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
             {
                 redirectUri = new Uri($"{HttpContext.Current.Request.Url.Scheme}://{HttpContext.Current.Request.Url.Host}:{HttpContext.Current.Request.Url.Port}/{BotConstants.CallbackPath}");
 
-                state = $"&state={this.GenerateState(context)}";
+                state = $"&state={GenerateState(context)}";
 
-                authUrl = await this.service.TokenManagement.GetAuthorizationRequestUrlAsync(
-                    $"{this.service.Configuration.ActiveDirectoryEndpoint}/{BotConstants.AuthorityEndpoint}",
+                authUrl = await service.TokenManagement.GetAuthorizationRequestUrlAsync(
+                    $"{service.Configuration.ActiveDirectoryEndpoint}/{BotConstants.AuthorityEndpoint}",
                     redirectUri,
-                    this.service.Configuration.GraphEndpoint,
+                    service.Configuration.GraphEndpoint,
                     state);
 
                 message = context.MakeMessage();
@@ -129,7 +129,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
                     Resources.SigninCardText, Resources.LoginCaptial, authUrl).ToAttachment());
 
                 await context.PostAsync(message);
-                context.Wait(this.MessageReceivedAsync);
+                context.Wait(MessageReceivedAsync);
             }
             finally
             {
@@ -156,12 +156,12 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
             {
                 state = new Dictionary<string, string>
                 {
-                    { BotConstants.BotIdKey, this.conversationReference.Bot.Id },
-                    { BotConstants.ChannelIdKey, this.conversationReference.ChannelId },
-                    { BotConstants.ConversationIdKey, this.conversationReference.Conversation.Id },
+                    { BotConstants.BotIdKey, conversationReference.Bot.Id },
+                    { BotConstants.ChannelIdKey, conversationReference.ChannelId },
+                    { BotConstants.ConversationIdKey, conversationReference.Conversation.Id },
                     { BotConstants.UniqueIdentifierKey, uniqueId.ToString() },
-                    { BotConstants.ServiceUrlKey, this.conversationReference.ServiceUrl },
-                    { BotConstants.UserIdKey, this.conversationReference.User.Id }
+                    { BotConstants.ServiceUrlKey, conversationReference.ServiceUrl },
+                    { BotConstants.UserIdKey, conversationReference.User.Id }
                 };
 
                 // Save the unique identifier in the user's private conversation store. This value will be 

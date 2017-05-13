@@ -10,6 +10,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
     using Cache;
     using Configuration;
     using Intents;
+    using Office;
     using Security;
     using Telemetry;
 
@@ -47,6 +48,11 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
         /// Gets a reference to the partner operations.
         /// </summary>
         IPartnerOperations PartnerOperations { get; }
+
+        /// <summary>
+        /// Gets a reference t the service communications service.
+        /// </summary>
+        IServiceCommunications ServiceCommunications { get; }
 
         /// <summary>
         /// Gets the telemetry service reference.

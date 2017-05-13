@@ -27,6 +27,11 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
         public const string ListSubscriptions = "ListSubscriptions";
 
         /// <summary>
+        /// Intent name for the office issues intent.
+        /// </summary>
+        public const string OfficeIssues = "OfficeIssues";
+
+        /// <summary>
         /// Intent name for the question and answer intent.
         /// </summary>
         public const string Question = "Question";

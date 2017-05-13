@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="SelectSubscriptionIntent.cs" company="Microsoft">
+// <copyright file="OfficeIssuesIntent.cs" company="Microsoft">
 //     Copyright (c) Microsoft Corporation. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -8,35 +8,35 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
     using Logic;
+    using Logic.Office;
     using Microsoft.Bot.Builder.Dialogs;
-    using Microsoft.Bot.Builder.Luis;
     using Microsoft.Bot.Builder.Luis.Models;
     using Microsoft.Bot.Connector;
-    using PartnerCenter.Models.Subscriptions;
     using Security;
 
     /// <summary>
-    /// Processes the request to select a specific subscription.
+    /// Processes the request to list Office 365 issues. 
     /// </summary>
     /// <seealso cref="IIntent" />
-    public class SelectSubscriptionIntent : IIntent
+    public class OfficeIssuesIntent : IIntent
     {
         /// <summary>
         /// Gets the message to be displayed when help has been requested.
         /// </summary>
-        public string HelpMessage => string.Empty;
+        public string HelpMessage => Resources.OfficeIssuesHelpMessage;
 
         /// <summary>
         /// Gets the name of the intent.
         /// </summary>
-        public string Name => IntentConstants.SelectSubscription;
+        public string Name => IntentConstants.OfficeIssues;
 
         /// <summary>
         /// Gets the permissions required to perform the operation represented by this intent.
         /// </summary>
-        public UserRoles Permissions => UserRoles.Partner | UserRoles.AdminAgents;
+        public UserRoles Permissions => UserRoles.Partner | UserRoles.GlobalAdmin;
 
         /// <summary>
         /// Performs the operation represented by this intent.
@@ -44,7 +44,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
         /// <param name="context">The context of the conversational process.</param>
         /// <param name="message">The message from the authenticated user.</param>
         /// <param name="result">The result from Language Understanding cognitive service.</param>
-        /// <param name="service">Provides access to core services.</param>
+        /// <param name="service">Provides access to core services;.</param>
         /// <returns>An instance of <see cref="Task"/> that represents the asynchronous operation.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="context"/> is null.
@@ -57,14 +57,13 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
         /// </exception>
         public async Task ExecuteAsync(IDialogContext context, IAwaitable<IMessageActivity> message, LuisResult result, IBotService service)
         {
+            AuthenticationToken token;
             CustomerPrincipal principal;
             DateTime startTime;
             Dictionary<string, double> eventMetrics;
             Dictionary<string, string> eventProperties;
-            EntityRecommendation indentifierEntity;
             IMessageActivity response;
-            Subscription subscription;
-            string subscriptionId = string.Empty;
+            List<HealthEvent> healthEvents;
 
             context.AssertNotNull(nameof(context));
             message.AssertNotNull(nameof(message));
@@ -74,63 +73,67 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
             try
             {
                 startTime = DateTime.Now;
-                response = context.MakeMessage();
 
                 principal = await context.GetCustomerPrincipalAsync(service);
 
-                if (result.TryFindEntity("identifier", out indentifierEntity))
+                if (principal.CustomerId.Equals(service.Configuration.PartnerCenterApplicationTenantId, StringComparison.CurrentCultureIgnoreCase))
                 {
-                    subscriptionId = indentifierEntity.Entity.Replace(" ", string.Empty);
-                    principal.Operation.SubscriptionId = subscriptionId;
+                    principal.AssertValidCustomerContext(Resources.SelectCustomerFirst);
 
-                    subscription = await service.PartnerOperations.GetSubscriptionAsync(principal);
+                    token = await service.TokenManagement.GetAppOnlyTokenAsync(
+                        $"{service.Configuration.ActiveDirectoryEndpoint}/{principal.Operation.CustomerId}",
+                        service.Configuration.OfficeManagementEndpoint);
 
-                    if (subscription == null)
-                    {
-                        response.Text = Resources.UnableToLocateSubscription;
-                    }
-                    else
-                    {
-                        context.StoreCustomerPrincipal(principal);
-                    }
-                }
-
-                if (string.IsNullOrEmpty(subscriptionId))
-                {
-                    response.Text = Resources.UnableToLocateSubscription;
+                    healthEvents = await service.ServiceCommunications.GetCurrentStatusAsync(principal.Operation.CustomerId, token.Token);
                 }
                 else
                 {
-                    response.Text = $"{Resources.SubscriptionContext} {subscriptionId}";
+                    token = await service.TokenManagement.GetAppOnlyTokenAsync(
+                        $"{service.Configuration.ActiveDirectoryEndpoint}/{principal.CustomerId}",
+                        service.Configuration.OfficeManagementEndpoint);
+
+                    healthEvents = await service.ServiceCommunications.GetCurrentStatusAsync(principal.CustomerId, token.Token);
                 }
+
+                response = context.MakeMessage();
+                response.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                response.Attachments = healthEvents.Select(e => e.ToAttachment()).ToList();
 
                 await context.PostAsync(response);
 
                 // Track the event measurements for analysis.
                 eventMetrics = new Dictionary<string, double>
                 {
-                    { "ElapsedMilliseconds", DateTime.Now.Subtract(startTime).TotalMilliseconds }
+                    { "ElapsedMilliseconds", DateTime.Now.Subtract(startTime).TotalMilliseconds },
+                    { "NumberOfSubscriptions", response.Attachments.Count }
                 };
 
                 // Capture the request for the customer summary for analysis.
                 eventProperties = new Dictionary<string, string>
                 {
                     { "ChannelId", context.Activity.ChannelId },
-                    { "SubscriptionId", subscriptionId },
-                    { "PrincipalCustomerId", principal.CustomerId },
+                    { "CustomerId", principal.CustomerId },
                     { "LocalTimeStamp", context.Activity.LocalTimestamp.ToString() },
                     { "UserId", principal.ObjectId }
                 };
 
-                service.Telemetry.TrackEvent("SelectSubscription/ExecuteAsync", eventProperties, eventMetrics);
+                service.Telemetry.TrackEvent("OfficeIssues/Execute", eventProperties, eventMetrics);
+            }
+            catch (CommunicationException ex)
+            {
+                response = context.MakeMessage();
+                response.Text = Resources.ErrorMessage;
+
+                service.Telemetry.TrackException(ex);
+
+                await context.PostAsync(response);
             }
             finally
             {
-                indentifierEntity = null;
                 eventMetrics = null;
                 eventProperties = null;
-                message = null;
-                subscription = null;
+                principal = null;
+                response = null;
             }
         }
     }

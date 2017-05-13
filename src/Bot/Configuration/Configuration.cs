@@ -86,6 +86,11 @@ namespace Microsoft.Store.PartnerCenter.Bot.Configuration
         public string MicrosoftAppPassword => this.GetConfigurationValue("MicrosoftAppPassword");
 
         /// <summary>
+        /// Gets the Office 365 management endpoint address.
+        /// </summary>
+        public string OfficeManagementEndpoint => ConfigurationManager.AppSettings["OfficeManagementEndpoint"];
+
+        /// <summary>
         /// Gets the Partner Center API endpoint.
         /// </summary>
         public string PartnerCenterEndpoint => ConfigurationManager.AppSettings["PartnerCenterEndpoint"];

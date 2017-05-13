@@ -53,7 +53,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
 
             this.customerId = customerId;
             this.service = service;
-            this.client = new GraphServiceClient(new AuthenticationProvider(this.service, customerId));
+            client = new GraphServiceClient(new AuthenticationProvider(this.service, customerId));
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
             {
                 startTime = DateTime.Now;
 
-                directoryGroups = await this.client.Users[objectId].MemberOf.Request().GetAsync();
+                directoryGroups = await client.Users[objectId].MemberOf.Request().GetAsync();
                 roles = new List<RoleModel>();
 
                 do
@@ -116,7 +116,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
                         }));
                     }
 
-                    if (this.customerId.Equals(this.service.Configuration.PartnerCenterApplicationTenantId))
+                    if (customerId.Equals(service.Configuration.PartnerCenterApplicationTenantId))
                     {
                         groups = directoryGroups.CurrentPage.OfType<Group>().Where(
                             g => g.DisplayName.Equals("AdminAgents") || g.DisplayName.Equals("HelpdeskAgents") || g.DisplayName.Equals("SalesAgent")).ToList();
@@ -143,7 +143,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
                 // Capture the request for the customer summary for analysis.
                 eventProperties = new Dictionary<string, string>
                 {
-                    { "CustomerId", this.customerId },
+                    { "CustomerId", customerId },
                     { "ObjectId", objectId }
                 };
 
@@ -154,7 +154,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
                     { "NumberOfRoles", roles.Count }
                 };
 
-                this.service.Telemetry.TrackEvent("GetDirectoryRolesAsync", eventProperties, eventMeasurements);
+                service.Telemetry.TrackEvent("GetDirectoryRolesAsync", eventProperties, eventMeasurements);
 
                 return roles;
             }

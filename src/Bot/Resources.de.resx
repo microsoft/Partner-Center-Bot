@@ -120,14 +120,26 @@
   <data name="AuthenticationSuccessDoneMessage" xml:space="preserve">
     <value>Hallo {0}! Was möchten Sie tun?</value>
   </data>
+  <data name="CustomerContext" xml:space="preserve">
+    <value>Kundenkontext ist nun so konfiguriert</value>
+  </data>
   <data name="DataProtectionUnprotectException" xml:space="preserve">
     <value>Fehler beim Aufheben der angegebenen Daten.</value>
+  </data>
+  <data name="Help" xml:space="preserve">
+    <value>Hilfe</value>
   </data>
   <data name="HelpMessage" xml:space="preserve">
     <value>Sie können mit mir in folgender Weise interagieren:</value>
   </data>
   <data name="InvalidAuthenticationException" xml:space="preserve">
     <value>Die Authentifizierungsanforderung war ungültig. Versuchen Sie, erneut zu authentifizieren, wenn das Problem weiterhin bestehen wenden Sie sich bitte an Support.</value>
+  </data>
+  <data name="InvalidCustomerContextException" xml:space="preserve">
+    <value>Sie müssen einen Kunden auswählen, bevor Sie versuchen, diesen Vorgang. Bitte geben Sie ** Liste Kunden **, wählen Sie einen Kunden und versuchen Sie es erneut.</value>
+  </data>
+  <data name="InvalidSubscriptionContextException" xml:space="preserve">
+    <value>Sie müssen ein Abonnement vor dem Versuch diesen Vorgang auswählen. Bitte geben Sie ** Liste Abonnements **, wählen Sie ein Abonnement, und versuchen Sie es erneut.</value>
   </data>
   <data name="ListCustomersHelpMessage" xml:space="preserve">
     <value>Liste-Kunden</value>
@@ -136,7 +148,7 @@
     <value>Liste</value>
   </data>
   <data name="ListSubscriptionssHelpMessage" xml:space="preserve">
-    <value>Abonnements</value>
+    <value>Liste-Abonnements</value>
   </data>
   <data name="Login" xml:space="preserve">
     <value>Login</value>
@@ -150,11 +162,32 @@
   <data name="NotAuthenticatedHelpMessage" xml:space="preserve">
     <value>Müssen Sie sich zuerst anmelden bevor Sie Interaktion mit mir. Bitte geben Sie ** Login ** zu authentifizieren. Wenn Sie noch, Typ Hilfe benötigen ** Hilfe ** nach erfolgreich authentifizieren.</value>
   </data>
+  <data name="OfficeIssuesHelpMessage" xml:space="preserve">
+    <value>Fragen gibt es Probleme mit Office 365?</value>
+  </data>
+  <data name="QuestionHelpMessage" xml:space="preserve">
+    <value>Fragen wie was EMS ist?</value>
+  </data>
   <data name="RedisCacheConnectionException" xml:space="preserve">
     <value>Fehler beim Verbinden mit der angegebenen Instanz.</value>
   </data>
+  <data name="RewordQuestion" xml:space="preserve">
+    <value>Bitte formulieren Sie Ihre Frage und versuchen Sie es erneut.</value>
+  </data>
+  <data name="SelectCaptial" xml:space="preserve">
+    <value>Wählen Sie</value>
+  </data>
+  <data name="ServiceInitializedException" xml:space="preserve">
+    <value>Diese Funktion kann nicht aufgerufen werden, nachdem der Bot-Dienst initialisiert wurde.</value>
+  </data>
   <data name="SigninCardText" xml:space="preserve">
     <value>Klicken Sie bitte unten auf Login.</value>
+  </data>
+  <data name="SubscriptionContext" xml:space="preserve">
+    <value>Abonnement-Kontext ist nun so konfiguriert</value>
+  </data>
+  <data name="SubscriptionRequestMessage" xml:space="preserve">
+    <value>Hier sind die Abonnements für {0}</value>
   </data>
   <data name="SuccessfulAuthentication" xml:space="preserve">
     <value>Sie haben erfolgreich authentifiziert! Wenden Sie sich bitte dieses Fenster schließen und weiter im Gespräch mit dem Bot.</value>
@@ -162,34 +195,16 @@
   <data name="UnableToLocateCustomer" xml:space="preserve">
     <value>Nicht in der Lage, den ausgewählten Kunden zu finden. Bitte geben Sie ** Liste Kunden ** und versuchen Sie es erneut.</value>
   </data>
-  <data name="Help" xml:space="preserve">
-    <value>Hilfe</value>
-  </data>
-  <data name="RewordQuestion" xml:space="preserve">
-    <value>Bitte formulieren Sie Ihre Frage und versuchen Sie es erneut.</value>
-  </data>
-  <data name="InvalidCustomerContextException" xml:space="preserve">
-    <value>Sie müssen einen Kunden auswählen, bevor Sie versuchen, diesen Vorgang. Bitte geben Sie ** Liste Kunden **, wählen Sie einen Kunden und versuchen Sie es erneut.</value>
-  </data>
-  <data name="SubscriptionRequestMessage" xml:space="preserve">
-    <value>Hier sind die Abonnements für {0}</value>
-  </data>
-  <data name="ServiceInitializedException" xml:space="preserve">
-    <value>Diese Funktion kann nicht aufgerufen werden, nachdem der Bot-Dienst initialisiert wurde.</value>
-  </data>
-  <data name="CustomerContext" xml:space="preserve">
-    <value>Kundenkontext ist nun so konfiguriert</value>
-  </data>
-  <data name="SelectCaptial" xml:space="preserve">
-    <value>Wählen Sie</value>
-  </data>
-  <data name="SubscriptionContext" xml:space="preserve">
-    <value>Abonnement-Kontext ist nun so konfiguriert</value>
-  </data>
   <data name="UnableToLocateSubscription" xml:space="preserve">
     <value>Nicht in der Lage, das ausgewählte Abonnement zu finden. Bitte geben Sie ** Abonnements Liste ** und versuchen Sie es erneut.</value>
   </data>
   <data name="Welcome" xml:space="preserve">
     <value>Willkommen bei der Partner-Center Bot. Müssen Sie sich zuerst anmelden bevor Sie Interaktion mit mir. Bitte geben Sie ** Login ** zu authentifizieren. Wenn Sie noch, Typ Hilfe benötigen ** Hilfe ** nach erfolgreich authentifizieren.</value>
+  </data>
+  <data name="ErrorMessage" xml:space="preserve">
+    <value>Es scheint ein Problem, das mich daran hindert, diese Anforderung zu erfüllen. Bitte versuchen Sie es später noch einmal</value>
+  </data>
+  <data name="SelectCustomerFirst" xml:space="preserve">
+    <value>Sie müssen einen Kunden auswählen, bevor Sie versuchen, diesen Vorgang. Bitte senden Sie ** Liste Kunden **, wählen Sie einen Kunden und versuchen Sie es erneut.</value>
   </data>
 </root>

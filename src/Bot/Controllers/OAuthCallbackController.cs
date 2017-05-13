@@ -94,14 +94,14 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
                     botData = scope.Resolve<IBotData>();
                     await botData.LoadAsync(cancellationToken);
 
-                    if (!this.Validate(botData, stateData))
+                    if (!Validate(botData, stateData))
                     {
                         return Request.CreateErrorResponse(
                             HttpStatusCode.BadRequest,
                             new InvalidOperationException(Resources.InvalidAuthenticationException));
                     }
 
-                    principal = await this.GetCustomerPrincipalAsync(code);
+                    principal = await GetCustomerPrincipalAsync(code);
 
                     if (principal == null)
                     {
@@ -134,7 +134,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
                         { "NumberOfRoles", principal.Roles.Count }
                     };
 
-                    this.Service.Telemetry.TrackEvent("api/OAuthCallback", eventProperties, eventMeasurements);
+                    Service.Telemetry.TrackEvent("api/OAuthCallback", eventProperties, eventMeasurements);
 
                     response = Request.CreateResponse(HttpStatusCode.OK);
                     response.Content = new StringContent(Resources.SuccessfulAuthentication);
@@ -142,7 +142,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
             }
             catch (Exception ex)
             {
-                this.Service.Telemetry.TrackException(ex);
+                Service.Telemetry.TrackException(ex);
                 response = Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex);
             }
             finally
@@ -182,20 +182,20 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
                 redirectUri =
                     new Uri($"{HttpContext.Current.Request.Url.Scheme}://{HttpContext.Current.Request.Url.Host}:{HttpContext.Current.Request.Url.Port}/{BotConstants.CallbackPath}");
 
-                authResult = await this.Service.TokenManagement.GetTokenByAuthorizationCodeAsync(
-                    $"{this.Service.Configuration.ActiveDirectoryEndpoint}/{BotConstants.AuthorityEndpoint}",
+                authResult = await Service.TokenManagement.GetTokenByAuthorizationCodeAsync(
+                    $"{Service.Configuration.ActiveDirectoryEndpoint}/{BotConstants.AuthorityEndpoint}",
                     code,
-                    this.Service.Configuration.GraphEndpoint,
+                    Service.Configuration.GraphEndpoint,
                     redirectUri);
 
-                client = new GraphClient(this.Service, authResult.TenantId);
+                client = new GraphClient(Service, authResult.TenantId);
 
                 roles = await client.GetDirectoryRolesAsync(authResult.UserInfo.UniqueId);
 
                 principal = new CustomerPrincipal
                 {
                     AccessToken = authResult.AccessToken,
-                    AvailableIntents = (from intent in this.Service.Intent.Intents
+                    AvailableIntents = (from intent in Service.Intent.Intents
                                         let roleList = Permissions.GetRoles(intent.Value.Permissions)
                                         from r in roleList
                                         where roles.SingleOrDefault(x => x.DisplayName.Equals(r)) != null
@@ -207,11 +207,11 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
                     Roles = roles
                 };
 
-                if (!this.Service.Configuration.ApplicationTenantId.Equals(
+                if (!Service.Configuration.ApplicationTenantId.Equals(
                     authResult.TenantId,
                     StringComparison.CurrentCultureIgnoreCase))
                 {
-                    await this.Service.PartnerOperations.GetCustomerAsync(principal, authResult.TenantId);
+                    await Service.PartnerOperations.GetCustomerAsync(principal, authResult.TenantId);
                 }
 
                 return principal;
@@ -245,12 +245,10 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
         /// </exception>
         private bool Validate(IBotData botData, IDictionary<string, string> stateData)
         {
-            string uniqueId;
-
             botData.AssertNotNull(nameof(botData));
             stateData.AssertNotNull(nameof(stateData));
 
-            if (botData.PrivateConversationData.TryGetValue(BotConstants.UniqueIdentifierKey, out uniqueId))
+            if (botData.PrivateConversationData.TryGetValue(BotConstants.UniqueIdentifierKey, out string uniqueId))
             {
                 if (!uniqueId.Equals(stateData[BotConstants.UniqueIdentifierKey], StringComparison.CurrentCultureIgnoreCase))
                 {

@@ -61,7 +61,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
             Customer customer = null;
             CustomerPrincipal principal;
             DateTime startTime;
-            Dictionary<string, double> eventMeasurements;
+            Dictionary<string, double> eventMetrics;
             Dictionary<string, string> eventProperties;
             IMessageActivity response;
             List<Subscription> subscriptions;
@@ -94,6 +94,13 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
 
                 await context.PostAsync(response);
 
+                // Track the event measurements for analysis.
+                eventMetrics = new Dictionary<string, double>
+                {
+                    { "ElapsedMilliseconds", DateTime.Now.Subtract(startTime).TotalMilliseconds },
+                    { "NumberOfSubscriptions", response.Attachments.Count }
+                };
+
                 // Capture the request for the customer summary for analysis.
                 eventProperties = new Dictionary<string, string>
                 {
@@ -103,19 +110,12 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
                     { "UserId", principal.ObjectId }
                 };
 
-                // Track the event measurements for analysis.
-                eventMeasurements = new Dictionary<string, double>
-                {
-                    { "ElapsedMilliseconds", DateTime.Now.Subtract(startTime).TotalMilliseconds },
-                    { "NumberOfSubscriptions", response.Attachments.Count }
-                };
-
-                service.Telemetry.TrackEvent("ListCustomers/Execute", eventProperties, eventMeasurements);
+                service.Telemetry.TrackEvent("ListCustomers/Execute", eventProperties, eventMetrics);
             }
             finally
             {
                 customer = null;
-                eventMeasurements = null;
+                eventMetrics = null;
                 eventProperties = null;
                 principal = null;
                 response = null;

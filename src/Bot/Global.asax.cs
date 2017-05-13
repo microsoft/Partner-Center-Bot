@@ -40,7 +40,7 @@ namespace Microsoft.Store.PartnerCenter.Bot
                 ApplicationInsights.Extensibility.TelemetryConfiguration.Active.InstrumentationKey =
                     service.Configuration.InstrumentationKey;
 
-               service.InitializeAsync().Wait();
+                service.InitializeAsync().Wait();
             }
 
             GlobalConfiguration.Configure(WebApiConfig.Register);

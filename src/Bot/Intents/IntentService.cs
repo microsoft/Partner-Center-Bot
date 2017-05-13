@@ -56,7 +56,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
 
             try
             {
-                this.intents = new Dictionary<string, IIntent>();
+                intents = new Dictionary<string, IIntent>();
                 intentTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsClass && t.GetInterface("IIntent") != null);
 
                 foreach (Type t in intentTypes)
@@ -68,8 +68,8 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
                         continue;
                     }
 
-                    this.intents.Add(intent.Name, intent);
-                    this.service.Telemetry.TrackTrace($"Initialized {intent.Name} intent.");
+                    intents.Add(intent.Name, intent);
+                    service.Telemetry.TrackTrace($"Initialized {intent.Name} intent.");
                 }
             }
             finally

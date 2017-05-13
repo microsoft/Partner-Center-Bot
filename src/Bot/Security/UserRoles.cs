@@ -53,6 +53,11 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
         UserAdministrator = 32,
 
         /// <summary>
+        /// Combination of all available roles.
+        /// </summary>
+        Any = AdminAgents | BillingAdmin | GlobalAdmin | HelpdeskAgent | SalesAgent | User | UserAdministrator,
+
+        /// <summary>
         /// Combination of the available partner roles.
         /// </summary>
         Partner = AdminAgents | HelpdeskAgent | SalesAgent,

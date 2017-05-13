@@ -33,8 +33,8 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
             {
                 IBotService service = scope.Resolve<IBotService>();
 
-                this.MicrosoftAppId = service.Configuration.MicrosoftAppId;
-                this.MicrosoftAppPassword = service.Configuration.MicrosoftAppPassword;
+                MicrosoftAppId = service.Configuration.MicrosoftAppId;
+                MicrosoftAppPassword = service.Configuration.MicrosoftAppPassword;
             }
 
             return base.OnActionExecutingAsync(actionContext, cancellationToken);

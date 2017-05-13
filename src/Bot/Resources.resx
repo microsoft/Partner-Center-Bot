@@ -126,6 +126,9 @@
   <data name="DataProtectionUnprotectException" xml:space="preserve">
     <value>Failed to unprotect the specified data.</value>
   </data>
+  <data name="ErrorMessage" xml:space="preserve">
+    <value>There appears to be an issue preventing me from fulfilling this request. Please try again later</value>
+  </data>
   <data name="Help" xml:space="preserve">
     <value>help</value>
   </data>
@@ -138,6 +141,9 @@
   <data name="InvalidCustomerContextException" xml:space="preserve">
     <value>You must select a customer before attempting this operation. Please type ** list customers **, select a customer, and then try again.</value>
   </data>
+  <data name="InvalidSubscriptionContextException" xml:space="preserve">
+    <value>You must select a subscription before attempting this operation. Please type ** list subscriptions**, select a subscription, and then try again.</value>
+  </data>
   <data name="ListCustomersHelpMessage" xml:space="preserve">
     <value>list customers</value>
   </data>
@@ -145,7 +151,7 @@
     <value>list</value>
   </data>
   <data name="ListSubscriptionssHelpMessage" xml:space="preserve">
-    <value>subscriptions</value>
+    <value>list subscriptions</value>
   </data>
   <data name="Login" xml:space="preserve">
     <value>login</value>
@@ -159,6 +165,12 @@
   <data name="NotAuthenticatedHelpMessage" xml:space="preserve">
     <value>You must first login before interacting with me. Please type ** login ** to authenticate. If you still need help type ** help ** after successfully authenticating.</value>
   </data>
+  <data name="OfficeIssuesHelpMessage" xml:space="preserve">
+    <value>Ask are there any issues with Office 365?</value>
+  </data>
+  <data name="QuestionHelpMessage" xml:space="preserve">
+    <value>Ask questions such as what is EMS?</value>
+  </data>
   <data name="RedisCacheConnectionException" xml:space="preserve">
     <value>Failed to connect to the specified instance.</value>
   </data>
@@ -167,6 +179,9 @@
   </data>
   <data name="SelectCaptial" xml:space="preserve">
     <value>Select</value>
+  </data>
+  <data name="SelectCustomerFirst" xml:space="preserve">
+    <value>You must select a customer before attempting this operation. Please send **list customers**, select a customer, and then try again.</value>
   </data>
   <data name="ServiceInitializedException" xml:space="preserve">
     <value>Cannot invoke this function after the bot service has been initialized.</value>

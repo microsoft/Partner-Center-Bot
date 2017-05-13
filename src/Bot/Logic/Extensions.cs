@@ -15,6 +15,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
     using IdentityModel.Clients.ActiveDirectory;
     using Microsoft.Bot.Builder.Dialogs;
     using Microsoft.Bot.Connector;
+    using Office;
     using PartnerCenter.Models.Subscriptions;
     using Security;
 
@@ -92,6 +93,22 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
             {
                 attribute = null;
             }
+        }
+
+        /// <summary>
+        /// Transforms an instance of <see cref="HealthEvent"/> into an instance of <see cref="Attachment"/>
+        /// </summary>
+        /// <param name="healthEvent">An instance of <see cref="HealthEvent"/> to be transformed.</param>
+        /// <returns>An instance of <see cref="Attachment"/> that represents the health event.</returns>
+        public static Attachment ToAttachment(this HealthEvent healthEvent)
+        {
+            HeroCard card = new HeroCard
+            {
+                Subtitle = healthEvent.Status,
+                Title = healthEvent.WorkloadDisplayName
+            };
+
+            return card.ToAttachment();
         }
 
         /// <summary>
@@ -189,11 +206,38 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
         /// </summary>
         /// <param name="principalToValidate">An instance of <see cref="CustomerPrincipal"/> to validate.</param>
         /// <param name="message">The message to report in the exception.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="principalToValidate"/> is null.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// <paramref name="principalToValidate"/> does not contain a valid customer identifier.
+        /// </exception>
         public static void AssertValidCustomerContext(this CustomerPrincipal principalToValidate, string message)
         {
             principalToValidate.AssertNotNull(nameof(principalToValidate));
 
             if (string.IsNullOrEmpty(principalToValidate.Operation.CustomerId))
+            {
+                throw new InvalidOperationException(message);
+            }
+        }
+
+        /// <summary>
+        /// Ensures the given <see cref="CustomerPrincipal"/> has a valid subscription context.
+        /// </summary>
+        /// <param name="principalToValidate">An instance of <see cref="CustomerPrincipal"/> to validate.</param>
+        /// <param name="message">The message to report in the exception.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="principalToValidate"/> is null.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// <paramref name="principalToValidate"/> does not contain a valid subscription identifier.
+        /// </exception>
+        public static void AssertValidSubscriptionContext(this CustomerPrincipal principalToValidate, string message)
+        {
+            principalToValidate.AssertNotNull(nameof(principalToValidate));
+
+            if (string.IsNullOrEmpty(principalToValidate.Operation.SubscriptionId))
             {
                 throw new InvalidOperationException(message);
             }
