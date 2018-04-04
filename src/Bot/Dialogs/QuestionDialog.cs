@@ -9,10 +9,11 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
     using System;
     using System.Linq;
     using System.Threading.Tasks;
-    using Logic;
+    using Extensions;
     using Microsoft.Bot.Builder.CognitiveServices.QnAMaker;
     using Microsoft.Bot.Builder.Dialogs;
     using Microsoft.Bot.Connector;
+    using Providers;
 
     /// <summary>
     /// Dialog that processes questions from the authenticated user.
@@ -28,14 +29,14 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
         /// <summary>
         /// Initializes a new instance of the <see cref="QuestionDialog"/> class.
         /// </summary>
-        /// <param name="service">Provides access to core services.</param>
-        public QuestionDialog(IBotService service)
+        /// <param name="provider">Provides access to core services.</param>
+        public QuestionDialog(IBotProvider provider)
         {
-            service.AssertNotNull(nameof(service));
+            provider.AssertNotNull(nameof(provider));
 
             QnAService = new QnAMakerService(new QnAMakerAttribute(
-                service.Configuration.QnASubscriptionKey,
-                service.Configuration.QnAKnowledgebaseId,
+                provider.Configuration.QnASubscriptionKey.ToUnsecureString(),
+                provider.Configuration.QnAKnowledgebaseId,
                 "default message",
                 0.6));
         }

@@ -10,7 +10,8 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using Logic;
+    using Extensions;
+    using Providers;
 
     /// <summary>
     /// Provides access to the supported intents.
@@ -21,7 +22,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
         /// <summary>
         /// Provides access to core core services.
         /// </summary>
-        private readonly IBotService service;
+        private readonly IBotProvider provider;
         
         /// <summary>
         /// Provides a collection of supported intents.
@@ -31,14 +32,14 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
         /// <summary>
         /// Initializes a new instance of the <see cref="IntentService"/> class.
         /// </summary>
-        /// <param name="service">Provides access to core services.</param>
+        /// <param name="provider">Provides access to core services.</param>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="service"/> is null.
+        /// <paramref name="provider"/> is null.
         /// </exception>
-        public IntentService(IBotService service)
+        public IntentService(IBotProvider provider)
         {
-            service.AssertNotNull(nameof(service));
-            this.service = service;
+            provider.AssertNotNull(nameof(provider));
+            this.provider = provider;
         }
 
         /// <summary>
@@ -69,7 +70,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
                     }
 
                     intents.Add(intent.Name, intent);
-                    service.Telemetry.TrackTrace($"Initialized {intent.Name} intent.");
+                    provider.Telemetry.TrackTrace($"Initialized {intent.Name} intent.");
                 }
             }
             finally

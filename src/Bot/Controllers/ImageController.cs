@@ -15,6 +15,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
     using System.Net.Http.Headers;
     using System.Web.Http;
     using Logic;
+    using Providers;
 
     /// <summary>
     /// Provides the ability to dynamically generate images.
@@ -25,8 +26,8 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageController"/> class.
         /// </summary>
-        /// <param name="service">Provides access to core services.</param>
-        public ImageController(IBotService service) : base(service)
+        /// <param name="provider">Provides access to core services.</param>
+        public ImageController(IBotProvider provider) : base(provider)
         {
         }
 

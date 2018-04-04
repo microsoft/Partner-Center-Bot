@@ -1,24 +1,20 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="ICacheService.cs" company="Microsoft">
+// <copyright file="ICacheProvider.cs" company="Microsoft">
 //     Copyright (c) Microsoft Corporation. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Microsoft.Store.PartnerCenter.Bot.Cache
+namespace Microsoft.Store.PartnerCenter.Bot.Providers
 {
     using System;
     using System.Threading.Tasks;
+    using Cache;
 
     /// <summary>
-    /// Provides quick access to frequently utilized resources.
+    /// Represents a way to cache data structures.
     /// </summary>
-    public interface ICacheService
+    public interface ICacheProvider
     {
-        /// <summary>
-        /// Gets a value indicating whether caching is enabled.
-        /// </summary>
-        bool IsEnabled { get; }
-
         /// <summary>
         /// Removes all entities from the specified cache database. 
         /// </summary>
@@ -32,10 +28,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Cache
         /// <param name="database">Cache database type where the data is stored.</param>
         /// <param name="key">A unique identifier for the cache entry.</param>
         /// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
-        /// <exception cref="ArgumentException">
-        /// <paramref name="key"/> is null.
-        /// </exception>
-        Task DeleteAsync(CacheDatabaseType database, string key);
+        Task DeleteAsync(CacheDatabaseType database, string key = null);
 
         /// <summary>
         /// Fetches the specified entity from the cache.
@@ -46,9 +39,6 @@ namespace Microsoft.Store.PartnerCenter.Bot.Cache
         /// <returns>
         /// The entity associated with the specified key.
         /// </returns>
-        /// <exception cref="ArgumentException">
-        /// <paramref name="key"/> is null.
-        /// </exception>
         TEntity Fetch<TEntity>(CacheDatabaseType database, string key) where TEntity : class;
 
         /// <summary>
@@ -60,9 +50,6 @@ namespace Microsoft.Store.PartnerCenter.Bot.Cache
         /// <returns>
         /// The entity associated with the specified key.
         /// </returns>
-        /// <exception cref="ArgumentException">
-        /// <paramref name="key"/> is null.
-        /// </exception>
         Task<TEntity> FetchAsync<TEntity>(CacheDatabaseType database, string key) where TEntity : class;
 
         /// <summary>
@@ -74,12 +61,6 @@ namespace Microsoft.Store.PartnerCenter.Bot.Cache
         /// <param name="entity">The object to be cached.</param>
         /// <param name="expiration">When the cached object expires.</param>
         /// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
-        /// <exception cref="ArgumentException">
-        /// <paramref name="key"/> is null. 
-        /// </exception>
-        /// <exception cref="ArgumentNullException"> 
-        /// entity
-        /// </exception>
         Task StoreAsync<TEntity>(CacheDatabaseType database, string key, TEntity entity, TimeSpan? expiration = null)
             where TEntity : class;
 
@@ -94,10 +75,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Cache
         /// </summary>
         /// <param name="database">Cache database type where the data is stored.</param>
         /// <param name="key">A unique identifier for the cache entry.</param>
-        /// <exception cref="ArgumentException">
-        /// <paramref name="key"/> is null.
-        /// </exception>
-        void Delete(CacheDatabaseType database, string key);
+        void Delete(CacheDatabaseType database, string key = null);
 
         /// <summary>
         /// Stores the specified entity in the cache.
@@ -107,12 +85,6 @@ namespace Microsoft.Store.PartnerCenter.Bot.Cache
         /// <param name="key">A unique identifier for the cache entry.</param>
         /// <param name="entity">The object to be cached.</param>
         /// <param name="expiration">When the cached object expires.</param>
-        /// <exception cref="ArgumentException">
-        /// <paramref name="key"/> is null. 
-        /// </exception>
-        /// <exception cref="ArgumentNullException"> 
-        /// entity
-        /// </exception>
         void Store<TEntity>(CacheDatabaseType database, string key, TEntity entity, TimeSpan? expiration = null)
             where TEntity : class;
     }

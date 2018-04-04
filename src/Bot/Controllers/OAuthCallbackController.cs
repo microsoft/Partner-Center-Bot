@@ -17,6 +17,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
     using System.Web.Http;
     using Autofac;
     using Exceptions;
+    using Extensions;
     using IdentityModel.Clients.ActiveDirectory;
     using Logic;
     using Microsoft.Bot.Builder.ConnectorEx;
@@ -24,6 +25,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
     using Microsoft.Bot.Builder.Dialogs.Internals;
     using Microsoft.Bot.Connector;
     using Models;
+    using Providers;
     using Security;
 
     /// <summary>
@@ -35,11 +37,11 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
         /// <summary>
         /// Initializes a new instance of the <see cref="OAuthCallbackController"/> class.
         /// </summary>
-        /// <param name="service">Provides access to core services.</param>
+        /// <param name="provider">Provides access to core services.</param>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="service"/> is null.
+        /// <paramref name="provider"/> is null.
         /// </exception>
-        public OAuthCallbackController(IBotService service) : base(service)
+        public OAuthCallbackController(IBotProvider provider) : base(provider)
         {
         }
 
@@ -134,7 +136,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
                         { "NumberOfRoles", principal.Roles.Count }
                     };
 
-                    Service.Telemetry.TrackEvent("api/OAuthCallback", eventProperties, eventMeasurements);
+                    Provider.Telemetry.TrackEvent("api/OAuthCallback", eventProperties, eventMeasurements);
 
                     response = Request.CreateResponse(HttpStatusCode.OK);
                     response.Content = new StringContent(Resources.SuccessfulAuthentication);
@@ -142,7 +144,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
             }
             catch (Exception ex)
             {
-                Service.Telemetry.TrackException(ex);
+                Provider.Telemetry.TrackException(ex);
                 response = Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex);
             }
             finally
@@ -182,20 +184,26 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
                 redirectUri =
                     new Uri($"{HttpContext.Current.Request.Url.Scheme}://{HttpContext.Current.Request.Url.Host}:{HttpContext.Current.Request.Url.Port}/{BotConstants.CallbackPath}");
 
-                authResult = await Service.TokenManagement.GetTokenByAuthorizationCodeAsync(
-                    $"{Service.Configuration.ActiveDirectoryEndpoint}/{BotConstants.AuthorityEndpoint}",
+                authResult = await Provider.AccessToken.AcquireTokenByAuthorizationCodeAsync(
+                    $"{Provider.Configuration.ActiveDirectoryEndpoint}/{BotConstants.AuthorityEndpoint}",
                     code,
-                    Service.Configuration.GraphEndpoint,
-                    redirectUri);
+                    new ApplicationCredential
+                    {
+                        ApplicationId = Provider.Configuration.ApplicationId, 
+                        ApplicationSecret = Provider.Configuration.ApplicationSecret, 
+                        UseCache = true
+                    },
+                    redirectUri,
+                    Provider.Configuration.GraphEndpoint);
 
-                client = new GraphClient(Service, authResult.TenantId);
+                client = new GraphClient(Provider, authResult.TenantId);
 
                 roles = await client.GetDirectoryRolesAsync(authResult.UserInfo.UniqueId);
 
                 principal = new CustomerPrincipal
                 {
                     AccessToken = authResult.AccessToken,
-                    AvailableIntents = (from intent in Service.Intent.Intents
+                    AvailableIntents = (from intent in Provider.Intent.Intents
                                         let roleList = Permissions.GetRoles(intent.Value.Permissions)
                                         from r in roleList
                                         where roles.SingleOrDefault(x => x.DisplayName.Equals(r)) != null
@@ -207,11 +215,11 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
                     Roles = roles
                 };
 
-                if (!Service.Configuration.ApplicationTenantId.Equals(
+                if (!Provider.Configuration.ApplicationTenantId.Equals(
                     authResult.TenantId,
                     StringComparison.CurrentCultureIgnoreCase))
                 {
-                    await Service.PartnerOperations.GetCustomerAsync(principal, authResult.TenantId);
+                    await Provider.PartnerOperations.GetCustomerAsync(principal, authResult.TenantId);
                 }
 
                 return principal;

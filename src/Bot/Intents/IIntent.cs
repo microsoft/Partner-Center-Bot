@@ -12,6 +12,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
     using Microsoft.Bot.Builder.Luis.Models;
     using Microsoft.Bot.Connector;
     using Security;
+    using Providers; 
 
     /// <summary>
     /// Represents an intent discovered in the conversation.
@@ -39,17 +40,8 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
         /// <param name="context">The context of the conversational process.</param>
         /// <param name="message">The message from the authenticated user.</param>
         /// <param name="result">The result from Language Understanding cognitive service.</param>
-        /// <param name="service">Provides access to core services.</param>
+        /// <param name="provider">Provides access to core services.</param>
         /// <returns>An instance of <see cref="Task"/> that represents the asynchronous operation.</returns>
-        /// <exception cref="System.ArgumentNullException">
-        /// <paramref name="context"/> is null.
-        /// or
-        /// <paramref name="message"/> is null.
-        /// or
-        /// <paramref name="result"/> is null.
-        /// or 
-        /// <paramref name="service"/> is null.
-        /// </exception>
-        Task ExecuteAsync(IDialogContext context, IAwaitable<IMessageActivity> message, LuisResult result, IBotService service);
+        Task ExecuteAsync(IDialogContext context, IAwaitable<IMessageActivity> message, LuisResult result, IBotProvider provider);
     }
 }

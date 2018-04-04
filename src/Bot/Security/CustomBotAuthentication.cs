@@ -11,9 +11,10 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
     using System.Threading.Tasks;
     using System.Web.Http.Controllers;
     using Autofac;
-    using Logic;
+    using Extensions;
     using Microsoft.Bot.Connector;
-
+    using Providers;
+    
     /// <summary>
     /// Provides custom authentication for the bot itself.
     /// </summary>
@@ -31,10 +32,10 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
         {
             using (ILifetimeScope scope = WebApiApplication.Container.BeginLifetimeScope())
             {
-                IBotService service = scope.Resolve<IBotService>();
+                IBotProvider provider = scope.Resolve<IBotProvider>();
 
-                MicrosoftAppId = service.Configuration.MicrosoftAppId;
-                MicrosoftAppPassword = service.Configuration.MicrosoftAppPassword;
+                MicrosoftAppId = provider.Configuration.MicrosoftAppId;
+                MicrosoftAppPassword = provider.Configuration.MicrosoftAppPassword.ToUnsecureString();
             }
 
             return base.OnActionExecutingAsync(actionContext, cancellationToken);

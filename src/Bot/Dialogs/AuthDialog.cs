@@ -10,11 +10,12 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using System.Web;
-    using Logic;
+    using Extensions;
     using Microsoft.Bot.Builder.ConnectorEx;
     using Microsoft.Bot.Builder.Dialogs;
     using Microsoft.Bot.Connector;
     using Security;
+    using Providers; 
 
     /// <summary>
     /// Dialog that handles authentication requests.
@@ -25,7 +26,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
         /// <summary>
         /// Provides access to core application services.
         /// </summary>
-        private readonly IBotService service;
+        private readonly IBotProvider provider;
 
         /// <summary>
         /// The object that relates to a particular point in the conversation.
@@ -36,19 +37,19 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthDialog"/> class.
         /// </summary>
-        /// <param name="service">Provides access to core application services.</param>
+        /// <param name="provider">Provides access to core application services.</param>
         /// <param name="message">Message received by the bot from the end user.</param>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="service"/> is null.
+        /// <paramref name="provider"/> is null.
         /// or
         /// <paramref name="message"/> is null.
         /// </exception>
-        public AuthDialog(IBotService service, IMessageActivity message)
+        public AuthDialog(IBotProvider provider, IMessageActivity message)
         {
-            service.AssertNotNull(nameof(service));
+            provider.AssertNotNull(nameof(provider));
             message.AssertNotNull(nameof(message));
 
-            this.service = service;
+            this.provider = provider;
             conversationReference = message.ToConversationReference();
         }
 
@@ -117,10 +118,11 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
 
                 state = $"&state={GenerateState(context)}";
 
-                authUrl = await service.TokenManagement.GetAuthorizationRequestUrlAsync(
-                    $"{service.Configuration.ActiveDirectoryEndpoint}/{BotConstants.AuthorityEndpoint}",
+                authUrl = await provider.AccessToken.GetAuthorizationRequestUrlAsync(
+                    $"{provider.Configuration.ActiveDirectoryEndpoint}/{BotConstants.AuthorityEndpoint}",
+                    provider.Configuration.GraphEndpoint,
+                    provider.Configuration.ApplicationId,
                     redirectUri,
-                    service.Configuration.GraphEndpoint,
                     state);
 
                 message = context.MakeMessage();

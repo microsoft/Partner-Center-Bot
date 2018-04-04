@@ -12,7 +12,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Models
     /// Represents an access token used to access the Partner Center API.
     /// </summary>
     /// <seealso cref="Microsoft.Store.PartnerCenter.IPartnerCredentials" />
-    public class PartnerCenterTokenModel : IPartnerCredentials
+    public class PartnerCenterToken : IPartnerCredentials
     {
         /// <summary>
         /// Gets the expiry time in UTC for the token.

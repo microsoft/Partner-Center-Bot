@@ -14,9 +14,10 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
     using System.Threading.Tasks;
     using System.Web.Http;
     using Dialogs;
-    using Logic;
+    using Extensions;
     using Microsoft.Bot.Builder.Dialogs;
     using Microsoft.Bot.Connector;
+    using Providers;
     using Security;
 
     /// <summary>
@@ -30,11 +31,11 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
         /// <summary>
         /// Initializes a new instance of the <see cref="MessagesController"/> class.
         /// </summary>
-        /// <param name="service">Provides access to core services.</param>
+        /// <param name="provider">Provides access to core services.</param>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="service"/> is null.
+        /// <paramref name="provider"/> is null.
         /// </exception>
-        public MessagesController(IBotService service) : base(service)
+        public MessagesController(IBotProvider provider) : base(provider)
         {
         }
 
@@ -63,8 +64,8 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
                         client = new ConnectorClient(
                             new Uri(activity.ServiceUrl),
                             new MicrosoftAppCredentials(
-                                Service.Configuration.MicrosoftAppId,
-                                Service.Configuration.MicrosoftAppPassword));
+                                Provider.Configuration.MicrosoftAppId,
+                                Provider.Configuration.MicrosoftAppPassword.ToUnsecureString()));
 
                         await client.Conversations.ReplyToActivityAsync(activity.CreateReply(Resources.Welcome));
                     }
@@ -72,7 +73,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
 
                 if (activity.Type == ActivityTypes.Message)
                 {
-                    await Conversation.SendAsync(activity, () => new ActionDialog(Service));
+                    await Conversation.SendAsync(activity, () => new ActionDialog(Provider));
                 }
 
                 // Capture the request for the customer summary for analysis.
@@ -89,9 +90,14 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
                     { "ElapsedMilliseconds", DateTime.Now.Subtract(startTime).TotalMilliseconds }
                 };
 
-                Service.Telemetry.TrackEvent("api/messages", eventProperties, eventMeasurements);
+                Provider.Telemetry.TrackEvent("api/messages", eventProperties, eventMeasurements);
 
                 return new HttpResponseMessage(HttpStatusCode.Accepted);
+            }
+            catch (Exception ex)
+            {
+                Provider.Telemetry.TrackException(ex);
+                return new HttpResponseMessage(HttpStatusCode.BadRequest);
             }
             finally
             {

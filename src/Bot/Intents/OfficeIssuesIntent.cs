@@ -10,11 +10,14 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Logic;
+    using Extensions;
+    using IdentityModel.Clients.ActiveDirectory;
     using Logic.Office;
     using Microsoft.Bot.Builder.Dialogs;
     using Microsoft.Bot.Builder.Luis.Models;
     using Microsoft.Bot.Connector;
+    using Models;
+    using Providers;
     using Security;
 
     /// <summary>
@@ -44,7 +47,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
         /// <param name="context">The context of the conversational process.</param>
         /// <param name="message">The message from the authenticated user.</param>
         /// <param name="result">The result from Language Understanding cognitive service.</param>
-        /// <param name="service">Provides access to core services;.</param>
+        /// <param name="provider">Provides access to core services;.</param>
         /// <returns>An instance of <see cref="Task"/> that represents the asynchronous operation.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="context"/> is null.
@@ -53,47 +56,57 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
         /// or
         /// <paramref name="result"/> is null.
         /// or 
-        /// <paramref name="service"/> is null.
+        /// <paramref name="provider"/> is null.
         /// </exception>
-        public async Task ExecuteAsync(IDialogContext context, IAwaitable<IMessageActivity> message, LuisResult result, IBotService service)
+        public async Task ExecuteAsync(IDialogContext context, IAwaitable<IMessageActivity> message, LuisResult result, IBotProvider provider)
         {
-            AuthenticationToken token;
+            AuthenticationResult authResult;
             CustomerPrincipal principal;
             DateTime startTime;
             Dictionary<string, double> eventMetrics;
             Dictionary<string, string> eventProperties;
             IMessageActivity response;
             List<HealthEvent> healthEvents;
+            string authority;
+            string customerId;
 
             context.AssertNotNull(nameof(context));
             message.AssertNotNull(nameof(message));
             result.AssertNotNull(nameof(result));
-            service.AssertNotNull(nameof(service));
+            provider.AssertNotNull(nameof(provider));
 
             try
             {
                 startTime = DateTime.Now;
 
-                principal = await context.GetCustomerPrincipalAsync(service);
+                principal = await context.GetCustomerPrincipalAsync(provider);
 
-                if (principal.CustomerId.Equals(service.Configuration.PartnerCenterApplicationTenantId, StringComparison.CurrentCultureIgnoreCase))
+                if (principal.CustomerId.Equals(provider.Configuration.PartnerCenterAccountId, StringComparison.CurrentCultureIgnoreCase))
                 {
                     principal.AssertValidCustomerContext(Resources.SelectCustomerFirst);
 
-                    token = await service.TokenManagement.GetAppOnlyTokenAsync(
-                        $"{service.Configuration.ActiveDirectoryEndpoint}/{principal.Operation.CustomerId}",
-                        service.Configuration.OfficeManagementEndpoint);
-
-                    healthEvents = await service.ServiceCommunications.GetCurrentStatusAsync(principal.Operation.CustomerId, token.Token);
+                    authority = $"{provider.Configuration.ActiveDirectoryEndpoint}/{principal.Operation.CustomerId}";
+                    customerId = principal.Operation.CustomerId;
                 }
                 else
                 {
-                    token = await service.TokenManagement.GetAppOnlyTokenAsync(
-                        $"{service.Configuration.ActiveDirectoryEndpoint}/{principal.CustomerId}",
-                        service.Configuration.OfficeManagementEndpoint);
-
-                    healthEvents = await service.ServiceCommunications.GetCurrentStatusAsync(principal.CustomerId, token.Token);
+                    authority = $"{provider.Configuration.ActiveDirectoryEndpoint}/{principal.CustomerId}";
+                    customerId = principal.CustomerId;
                 }
+
+                authResult = await provider.AccessToken.GetAccessTokenAsync(
+                    $"{provider.Configuration.ActiveDirectoryEndpoint}/{principal.Operation.CustomerId}",
+                    provider.Configuration.OfficeManagementEndpoint,
+                    new ApplicationCredential
+                    {
+                        ApplicationId = provider.Configuration.ApplicationId,
+                        ApplicationSecret = provider.Configuration.ApplicationSecret,
+                        UseCache = true
+                    });
+
+                healthEvents = await provider.ServiceCommunications.GetCurrentStatusAsync(
+                    customerId,
+                    authResult.AccessToken);
 
                 response = context.MakeMessage();
                 response.AttachmentLayout = AttachmentLayoutTypes.Carousel;
@@ -117,14 +130,14 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
                     { "UserId", principal.ObjectId }
                 };
 
-                service.Telemetry.TrackEvent("OfficeIssues/Execute", eventProperties, eventMetrics);
+                provider.Telemetry.TrackEvent("OfficeIssues/Execute", eventProperties, eventMetrics);
             }
-            catch (CommunicationException ex)
+            catch (Exception ex)
             {
                 response = context.MakeMessage();
                 response.Text = Resources.ErrorMessage;
 
-                service.Telemetry.TrackException(ex);
+                provider.Telemetry.TrackException(ex);
 
                 await context.PostAsync(response);
             }

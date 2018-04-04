@@ -1,5 +1,5 @@
 # Deployment 
-Deploying and configure the Partner Center Bot requires numerous configurations. This document will guide you through each of the
+Deploying and configuring the Partner Center Bot requires numerous configurations. This document will guide you through each of the
 configurations. If you need help please log an issue using the [issue tracker](https://github.com/Microsoft/Partner-Center-Bot/issues).
 
 ## Prerequisites 
@@ -12,58 +12,10 @@ The following are _required_ prerequisites in order to perform the steps outline
 
 If you do not have the privileges then you will not able to perform the remaining operations in this guide.
 
-## Azure Key Vault 
-Azure Key Vault is used to protect application secrets and connection strings. An instance of Key Vault will be deployed, 
-the following sections will walk you through the configurations that are not automated yet.  
-
-### Create Certificate
-A certificate is utilized to obtain the required access token in order to interact with the vault. Perform 
-the following to create the certificate
-
-Modify the following PowerShell and then invoke it 
-
-```powershell
-$cert = New-SelfSignedCertificate -Subject "PartnerCenterBot" -CertStoreLocation Cert:CurrentUser -KeyExportPolicy Exportable -Type DocumentEncryptionCert -KeyUsage KeyEncipherment -KeySpec KeyExchange -KeyLength 2048 
-
-Export-Certificate -Cert $cert -FilePath C:\cert\bot.cer
-```
-
-### Create Azure AD Application 
-An Azure AD application is utilized to access the instance of Key Vault. This application is confiugred to 
-utilize the certificate that was created in the above step. Perform the following to create the and configure 
-the application
-
-1. Open PowerShell and install the [Azure PowerShell cmdlets](https://docs.microsoft.com/en-us/powershell/azureps-cmdlets-docs/)
-if you necessary
-2. Update the following cmdlets and then invoke them
-
-    ```powershell
-    Login-AzureRmAccount
-
-    ## Update these variable before invoking the rest of the cmdlets
-    $certFile = "C:\cert\bot.cer"
-    $identifierUri = "https://{0}/{1}" -f "tenant.onmicrosoft.com", [System.Guid]::NewGuid()
-    $resourceGroupName = "ResourceGroupName"
-
-    $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
-    $cert.Import($certFile)
-    $value = [System.Convert]::ToBase64String($cert.GetRawCertData())
-
-    $app = New-AzureRmADApplication -DisplayName "Partern Center Bot Vault App" -HomePage "https://localhost" -IdentifierUris $identifierUri -CertValue $value -EndDate $cert.NotAfter -StartDate $cert.NotBefore
-    $spn = New-AzureRmADServicePrincipal -ApplicationId $app.ApplicationId
-
-    # Get the certificate thumbprint value for the VaultApplicationCertThumbprint parameter
-    $cert.Thumbprint
-
-    # Get the application identifier that will be used to access the instance of Key Vault
-    $app.ApplicationId
-    ```
-
 ## Partner Center Azure AD Application
-The Partner Center API is utilized to verify the authenticated user belongs to a customer that 
-has a relationship with the configured partner. Perform the following to create the application 
+The Partner Center API is utilized to verify the authenticated user belongs to a customer that has a relationship with the configured partner. Perform the following to create the application 
 
-1. Login into the [Partner Center](https://partnercenter.microsoft.com) portal using credentials that have _AdminAgents_ and _Global Admin_ privileges
+1. Login to the [Partner Center](https://partnercenter.microsoft.com) portal using credentials that have _AdminAgents_ and _Global Admin_ privileges
 2. Click _Dashboard_ -> _Account Settings_ -> _App Management_ 
 3. Click on _Register existing_ app if you want to use an existing Azure AD application, or click _Add new web app_ to create a new one
 
@@ -76,10 +28,10 @@ has a relationship with the configured partner. Perform the following to create 
 ## Creating the Bot Azure AD Application
 The bot requires an Azure AD application that grants privileges to Azure AD and the Microsoft Graph. Perform the following tasks to create and configure the application 
 
-1. Login into the [Azure Management portal](https://portal.azure.com) using credentials that have _Global Admin_ privileges
-2. Open the _Azure Active Directory_ user experince and then click _App registration_
+1. Login to the [Azure Management portal](https://portal.azure.com) using credentials that have _Global Admin_ privileges
+2. Open the _Azure Active Directory_ user experience and then click _App registration_
 
-	![Azure AD application creation](Images/aad01.png)
+    ![Azure AD application creation](Images/aad01.png)
 
 3. Click _+ Add_ to start the new application wizard
 4. Specify an appropriate name for the bot, select _Web app / API_ for the application, an appropriate value for the sign-on URL, and then click _Create_
@@ -87,7 +39,7 @@ The bot requires an Azure AD application that grants privileges to Azure AD and 
 6. Add the _Microsoft Graph_ API and grant it the _Read directory data_ application permission
 7. Add the _Partner Center API_  and grant it the _Access Partner Center PPE_ delegated permission
 
-	![Azure AD application permissions](Images/aad02.png)
+    ![Azure AD application permissions](Images/aad02.png)
 
 8. Click _Grant Permissions_, found on the _Required Permissions_ blade, to consent to the application for the reseller tenant 
 
@@ -105,7 +57,7 @@ Perform the following to create and configure the Language Understanding Intelli
 Please checkout [Publish your app](https://docs.microsoft.com/en-us/azure/cognitive-services/LUIS/publishapp) for more information.
 
 ## Create a New Instance of the QnA Service 
-Perform the following in order to create a new instnace of the QnA service
+Perform the following in order to create a new instance of the QnA service
 
 1. Browse to https://qnamaker.ai/ and login using an appropriate account
 2. Click the _Create new service_ link found at the top of the page

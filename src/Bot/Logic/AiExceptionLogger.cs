@@ -8,6 +8,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
 {
     using System.Web.Http.ExceptionHandling;
     using Autofac;
+    using Providers;
 
     /// <summary>
     /// Represents an unhandled exception logger.
@@ -23,11 +24,11 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
         {
             using (ILifetimeScope scope = WebApiApplication.Container.BeginLifetimeScope())
             {
-                IBotService service = scope.Resolve<IBotService>();
+                IBotProvider provider = scope.Resolve<IBotProvider>();
 
                 if (context?.Exception != null)
                 {
-                    service.Telemetry.TrackException(context.Exception);
+                    provider.Telemetry.TrackException(context.Exception);
                 }
             }
 

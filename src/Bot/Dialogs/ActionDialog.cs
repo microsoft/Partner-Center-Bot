@@ -11,12 +11,13 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using Logic;
+    using Extensions;
     using Microsoft.Bot.Builder.Dialogs;
     using Microsoft.Bot.Builder.Luis;
     using Microsoft.Bot.Builder.Luis.Models;
     using Microsoft.Bot.Connector;
     using Security;
+    using Providers;
 
     /// <summary>
     /// Dialog that handles communication with the user.
@@ -30,21 +31,20 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
         /// <summary>
         /// Provides access to core application services.
         /// </summary>
-        private readonly IBotService service;
+        private readonly IBotProvider provider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ActionDialog"/> class.
         /// </summary>
-        /// <param name="service">Provides access to core application services.</param>
+        /// <param name="provider">Provides access to core application services.</param>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="service"/> is null.
+        /// <paramref name="provider"/> is null.
         /// </exception>
-        public ActionDialog(IBotService service) :
-            base(new LuisService(new LuisModelAttribute(service.Configuration.LuisAppId, service.Configuration.LuisApiKey)))
+        public ActionDialog(IBotProvider provider) :
+            base(new LuisService(new LuisModelAttribute(provider.Configuration.LuisAppId, provider.Configuration.LuisApiKey.ToUnsecureString())))
         {
-            service.AssertNotNull(nameof(service));
-
-            this.service = service;
+            provider.AssertNotNull(nameof(provider));
+            this.provider = provider;
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
             {
                 message = context.MakeMessage();
 
-                principal = await context.GetCustomerPrincipalAsync(this.service);
+                principal = await context.GetCustomerPrincipalAsync(provider);
 
                 if (principal == null)
                 {
@@ -113,7 +113,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
             {
                 key = result.TopScoringIntent.Intent.ToCamelCase();
 
-                principal = await context.GetCustomerPrincipalAsync(service);
+                principal = await context.GetCustomerPrincipalAsync(provider);
 
                 if (principal == null)
                 {
@@ -124,7 +124,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
                 if (principal.AvailableIntents.ContainsKey(key))
                 {
                     await principal.AvailableIntents[key]
-                        .ExecuteAsync(context, message, result, service);
+                        .ExecuteAsync(context, message, result, provider);
                 }
                 else
                 {
@@ -154,7 +154,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
                 if (message.Text.Equals(Resources.Login, StringComparison.CurrentCultureIgnoreCase))
                 {
                     await context.Forward(
-                        new AuthDialog(service, message),
+                        new AuthDialog(provider, message),
                         ResumeAfterAuth,
                         message,
                         CancellationToken.None);

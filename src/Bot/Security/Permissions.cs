@@ -7,7 +7,7 @@
 namespace Microsoft.Store.PartnerCenter.Bot.Security
 {
     using System.Collections.Generic;
-    using Logic;
+    using Extensions;
 
     /// <summary>
     /// Provides the ability to verify the authenticated user has the appropriate permissions.

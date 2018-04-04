@@ -8,9 +8,11 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
 {
     using System.Net.Http;
     using System.Threading.Tasks;
-    using Configuration;
     using Graph;
-    using Logic;
+    using IdentityModel.Clients.ActiveDirectory;
+    using Extensions;
+    using Models;
+    using Providers;
 
     /// <summary>
     /// Authentication provider for the Microsoft Graph service client.
@@ -31,7 +33,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
         /// <summary>
         /// Provides access to core services.
         /// </summary>
-        private readonly IBotService service;
+        private readonly IBotProvider provider;
 
         /// <summary>
         /// The customer identifier utilized to scope the Microsoft Graph requests.
@@ -41,21 +43,21 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthenticationProvider"/> class.
         /// </summary>
-        /// <param name="service">Provides access to core services.</param>
+        /// <param name="provider">Provides access to core services.</param>
         /// <param name="customerId">Identifier for customer whose resources are being accessed.</param>
         /// <exception cref="System.ArgumentException">
         /// <paramref name="customerId"/> is empty or null.
         /// </exception>
         /// <exception cref="System.ArgumentNullException">
-        /// <paramref name="service"/> is null.
+        /// <paramref name="provider"/> is null.
         /// </exception>
-        public AuthenticationProvider(IBotService service, string customerId)
+        public AuthenticationProvider(IBotProvider provider, string customerId)
         {
-            service.AssertNotNull(nameof(service));
+            provider.AssertNotNull(nameof(provider));
             customerId.AssertNotEmpty(nameof(customerId));
 
             this.customerId = customerId;
-            this.service = service;
+            this.provider = provider;
         }
 
         /// <summary>
@@ -65,11 +67,26 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
         /// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
         public async Task AuthenticateRequestAsync(HttpRequestMessage request)
         {
-            AuthenticationToken token = await this.service.TokenManagement.GetAppOnlyTokenAsync(
-                $"{this.service.Configuration.ActiveDirectoryEndpoint}/{this.customerId}",
-                this.service.Configuration.GraphEndpoint);
+            AuthenticationResult authResult; 
 
-            request.Headers.Add(AuthHeaderName, $"{TokenType} {token.Token}");
+            try
+            {
+                authResult = await provider.AccessToken.GetAccessTokenAsync(
+                    $"{provider.Configuration.ActiveDirectoryEndpoint}/{customerId}",
+                    provider.Configuration.GraphEndpoint,
+                    new ApplicationCredential
+                    {
+                        ApplicationId = provider.Configuration.ApplicationId,
+                        ApplicationSecret = provider.Configuration.ApplicationSecret,
+                        UseCache = true
+                    }).ConfigureAwait(false);
+
+                request.Headers.Add(AuthHeaderName, $"{TokenType} {authResult.AccessToken}");
+            }
+            finally
+            {
+                authResult = null;
+            }
         }
     }
 }

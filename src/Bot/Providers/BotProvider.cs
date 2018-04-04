@@ -1,39 +1,39 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="BotService.cs" company="Microsoft">
+// <copyright file="BotProvider.cs" company="Microsoft">
 //     Copyright (c) Microsoft Corporation. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Microsoft.Store.PartnerCenter.Bot.Logic
+namespace Microsoft.Store.PartnerCenter.Bot.Providers
 {
     using System;
     using System.Threading.Tasks;
-    using Autofac;
-    using Cache;
-    using Configuration;
     using Intents;
-    using Microsoft.Bot.Builder.Dialogs;
-    using Microsoft.Bot.Connector;
-    using Office;
-    using Security;
+    using Logic;
+    using Logic.Office;
     using Telemetry;
 
     /// <summary>
     /// Provides access to core services.
     /// </summary>
-    /// <seealso cref="IBotService" />
+    /// <seealso cref="IBotProvider" />
     [Serializable]
-    public class BotService : IBotService
+    public class BotProvider : IBotProvider
     {
+        /// <summary>
+        /// Provides the ability to manage access tokens.
+        /// </summary>
+        private static IAccessTokenProvider accessToken;
+
         /// <summary>
         /// Provides the ability to cache often used objects. 
         /// </summary>
-        private static ICacheService cache;
+        private static ICacheProvider cache;
 
         /// <summary>
         /// Provides the ability to access various configurations.
         /// </summary>
-        private static IConfiguration configuration;
+        private static IConfigurationProvider configuration;
 
         /// <summary>
         /// A flag indicating whether or the service has been initialized. 
@@ -48,7 +48,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
         /// <summary>
         /// Provides localization functionality for the bot.
         /// </summary>
-        private static ILocalizationService localization;
+        private static ILocalizationProvider localization;
 
         /// <summary>
         /// Provides the ability to perform various partner operations.
@@ -66,24 +66,24 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
         private static ITelemetryProvider telemetry;
 
         /// <summary>
-        /// Provides the ability to manage access tokens.
-        /// </summary>
-        private static ITokenManagement tokenManagement;
-
-        /// <summary>
         /// Provides the ability to retrieve and store data in a secure vault.
         /// </summary>
-        private static IVaultService vault;
+        private static IVaultProvider vault;
+
+        /// <summary>
+        /// Gets the a reference to the token management service.
+        /// </summary>
+        public IAccessTokenProvider AccessToken => accessToken ?? (accessToken = new AccessTokenProvider(this));
 
         /// <summary>
         /// Gets the service that provides caching functionality.
         /// </summary>
-        public ICacheService Cache => cache ?? (cache = new CacheService(this));
+        public ICacheProvider Cache => cache ?? (cache = new RedisCacheProvider(this));
 
         /// <summary>
         /// Gets a reference to the available configurations.
         /// </summary>
-        public IConfiguration Configuration => configuration ?? (configuration = new Configuration(this));
+        public IConfigurationProvider Configuration => configuration ?? (configuration = new ConfigurationProvider(this));
 
         /// <summary>
         /// Gets a flag indicating whether or the service has been initialized.
@@ -98,7 +98,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
         /// <summary>
         /// Gets the service that provide localization functionality.
         /// </summary>
-        public ILocalizationService Localization => localization;
+        public ILocalizationProvider Localization => localization;
 
         /// <summary>
         /// Gets a reference to the partner operations.
@@ -136,14 +136,9 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
         }
 
         /// <summary>
-        /// Gets the a reference to the token management service.
-        /// </summary>
-        public ITokenManagement TokenManagement => tokenManagement ?? (tokenManagement = new TokenManagement(this));
-
-        /// <summary>
         /// Gets a reference to the vault service.
         /// </summary>
-        public IVaultService Vault => vault ?? (vault = new VaultService(this));
+        public IVaultProvider Vault => vault ?? (vault = new KeyVaultProvider(this));
 
         /// <summary>
         /// Initializes the application core services.
@@ -151,35 +146,13 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
         /// <returns>A <see cref="Task"/> that represents the asynchronous operations.</returns>
         public async Task InitializeAsync()
         {
-            ContainerBuilder builder;
+            intent = new IntentService(this);
+            localization = new LocalizationProvider(this);
 
-            try
-            {
-                builder = new ContainerBuilder();
+            intent.Initialize();
 
-                intent = new IntentService(this);
-                localization = new LocalizationService(this);
-
-                intent.Initialize();
-                await localization.InitializeAsync();
-
-                initialized = true;
-
-                builder.Register(c =>
-                {
-                    return new MicrosoftAppCredentials(
-                        Configuration.MicrosoftAppId,
-                        Configuration.MicrosoftAppPassword);
-                }).SingleInstance();
-
-#pragma warning disable 0618
-                builder.Update(Conversation.Container);
-#pragma warning restore 0618
-            }
-            finally
-            {
-                builder = null;
-            }
+            await Configuration.InitializeAsync().ConfigureAwait(false);
+            await localization.InitializeAsync().ConfigureAwait(false); 
         }
     }
 }

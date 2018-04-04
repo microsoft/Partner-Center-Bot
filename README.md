@@ -1,20 +1,17 @@
 # Partner Center Bot
 This is a sample project that demonstrates how to leverage the Microsoft Bot framework to construct a bot that interacts with 
-Partner Center. With this initial release limitedfeatures are supported. Additional abilities will be added over time. The 
-intent of this project is not to provide a fully functional bot, but rather to demonstrate how this technology can be utilized 
-to support customers. 
+Partner Center. With this initial release, limited features are supported. Additional abilities will be added over time. The intent of this project is not to provide a fully functional bot, but rather to demonstrate how this technology can be utilized to support customers. 
 
-This project is being provided with community support only. If you need help please
-log an issue using the [issue tracker](https://github.com/Microsoft/Partner-Center-Bot/issues).
+This project is being provided with community support only. If you need help, please log an issue using the [issue tracker](https://github.com/Microsoft/Partner-Center-Bot/issues).
 
-__Current Build Status:__ ![Build Status](https://ustechsales.visualstudio.com/_apis/public/build/definitions/08b6a9c4-c5bc-47c3-b945-aa13e7567100/18/badge)
+__Current Build Status:__ ![Build Status](https://isaiahwilliams.visualstudio.com/_apis/public/build/definitions/5a07f243-b522-4dc6-9ad8-9addc8633db6/3/badge)
 
 ## Features 
-Currently this project has the ability to list customers, select a specific customer, and list the subscriptions for that particular customer. 
+Currently, this project has the ability to list customers, select a specific customer, and list the subscriptions for that particular customer. 
 
 ![Bot Interaction](docs/Images/bot01.png)
 
-In addition to integrating with Partner Center the bot integrates with the [QnA Maker](docs/QnAMaker.md) cognitive service.
+In addition to integrating with Partner Center, the bot integrates with the [QnA Maker](docs/QnAMaker.md) cognitive service.
 This makes it where the user can get answers to commonly asked questions.  
 
 ![Bot Interaction](docs/Images/bot02.png)

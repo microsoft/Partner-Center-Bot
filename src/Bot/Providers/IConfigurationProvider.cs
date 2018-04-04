@@ -1,15 +1,18 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="IConfiguration.cs" company="Microsoft">
+// <copyright file="IConfigurationProvider.cs" company="Microsoft">
 //     Copyright (c) Microsoft Corporation. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Microsoft.Store.PartnerCenter.Bot.Configuration
+namespace Microsoft.Store.PartnerCenter.Bot.Providers
 {
+    using System.Security;
+    using System.Threading.Tasks;
+
     /// <summary>
     /// Represents the ability to reference various configurations. 
     /// </summary>
-    public interface IConfiguration
+    public interface IConfigurationProvider
     {
         /// <summary>
         /// Gets the Azure Active Directory endpoint.
@@ -24,12 +27,22 @@ namespace Microsoft.Store.PartnerCenter.Bot.Configuration
         /// <summary>
         /// Gets the Azure AD application secret.
         /// </summary>
-        string ApplicationSecret { get; }
+        SecureString ApplicationSecret { get; }
 
         /// <summary>
         /// Gets the Azure AD application tenant identifier.
         /// </summary>
         string ApplicationTenantId { get; }
+
+        /// <summary>
+        /// Gets the access key for the instance of Cosmos Db.
+        /// </summary>
+        SecureString CosmosDbAccessKey { get; }
+
+        /// <summary>
+        /// Gets the Azure Cosmos DB endpoint address.
+        /// </summary>
+        string CosmosDbEndpoint { get; }
 
         /// <summary>
         /// Gets the Microsoft Graph endpoint.
@@ -42,14 +55,19 @@ namespace Microsoft.Store.PartnerCenter.Bot.Configuration
         string InstrumentationKey { get; }
 
         /// <summary>
-        /// Gets the LUIS application identifier.
+        /// Gets the endpoint address for the instance of Azure Key Vault.
         /// </summary>
-        string LuisAppId { get; }
+        string KeyVaultEndpoint { get; }
 
         /// <summary>
         /// Gets the LUIS API key.
         /// </summary>
-        string LuisApiKey { get; }
+        SecureString LuisApiKey { get; }
+
+        /// <summary>
+        /// Gets the LUIS application identifier.
+        /// </summary>
+        string LuisAppId { get; }
 
         /// <summary>
         /// Gets the Microsoft application identifier.
@@ -59,7 +77,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Configuration
         /// <summary>
         /// Gets the Microsoft application password.
         /// </summary>
-        string MicrosoftAppPassword { get; }
+        SecureString MicrosoftAppPassword { get; }
 
         /// <summary>
         /// Gets the Office 365 management endpoint address.
@@ -67,9 +85,9 @@ namespace Microsoft.Store.PartnerCenter.Bot.Configuration
         string OfficeManagementEndpoint { get; }
 
         /// <summary>
-        /// Gets the Partner Center API endpoint.
+        /// Gets the Partner Center account identifier. 
         /// </summary>
-        string PartnerCenterEndpoint { get; }
+        string PartnerCenterAccountId { get; }
 
         /// <summary>
         /// Gets the Partner Center application identifier value.
@@ -79,12 +97,12 @@ namespace Microsoft.Store.PartnerCenter.Bot.Configuration
         /// <summary>
         /// Gets the Partner Center application secret value.
         /// </summary>
-        string PartnerCenterApplicationSecret { get; }
+        SecureString PartnerCenterApplicationSecret { get; }
 
         /// <summary>
-        /// Gets the Partner Center application tenant identifier. 
+        /// Gets the Partner Center API endpoint.
         /// </summary>
-        string PartnerCenterApplicationTenantId { get; }
+        string PartnerCenterEndpoint { get; }
 
         /// <summary>
         /// Gets the question and answer knowledgebase identifier.
@@ -94,31 +112,17 @@ namespace Microsoft.Store.PartnerCenter.Bot.Configuration
         /// <summary>
         /// Gets question and answer subscription subscription key.
         /// </summary>
-        string QnASubscriptionKey { get; }
+        SecureString QnASubscriptionKey { get; }
 
         /// <summary>
         /// Gets the Redis Cache connection string.
         /// </summary>
-        string RedisCacheConnectionString { get; }
+        SecureString RedisCacheConnectionString { get; }
 
         /// <summary>
-        /// Gets the vault application certificate thumbprint.
+        /// Performs the necessary initialization operations.
         /// </summary>
-        string VaultApplicationCertThumbprint { get; }
-
-        /// <summary>
-        /// Gets the vault application identifier.
-        /// </summary>
-        string VaultApplicationId { get; }
-
-        /// <summary>
-        /// Gets the vault application tenant identifier.
-        /// </summary>
-        string VaultApplicationTenantId { get; }
-
-        /// <summary>
-        /// Gets the base address for the vault.
-        /// </summary>
-        string VaultBaseAddress { get; }
+        /// <returns>An instance of the <see cref="Task"/> class that represents the asynchronous operation.</returns>
+        Task InitializeAsync();
     }
 }

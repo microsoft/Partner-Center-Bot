@@ -9,11 +9,12 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
     using System.Threading;
     using System.Threading.Tasks;
     using Dialogs;
-    using Logic;
+    using Extensions;
     using Microsoft.Bot.Builder.Dialogs;
     using Microsoft.Bot.Builder.Luis.Models;
     using Microsoft.Bot.Connector;
     using Security;
+    using Providers; 
 
     /// <summary>
     /// Processes the question intent.
@@ -42,7 +43,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
         /// <param name="context">The context of the conversational process.</param>
         /// <param name="message">The message from the authenticated user.</param>
         /// <param name="result">The result from Language Understanding cognitive service.</param>
-        /// <param name="service">Provides access to core services;.</param>
+        /// <param name="provider">Provides access to core services;.</param>
         /// <returns>An instance of <see cref="Task"/> that represents the asynchronous operation.</returns>
         /// <exception cref="System.ArgumentNullException">
         /// <paramref name="context"/> is null.
@@ -51,23 +52,23 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
         /// or
         /// <paramref name="result"/> is null.
         /// or 
-        /// <paramref name="service"/> is null.
+        /// <paramref name="provider"/> is null.
         /// </exception>
-        public async Task ExecuteAsync(IDialogContext context, IAwaitable<IMessageActivity> message, LuisResult result, IBotService service)
+        public async Task ExecuteAsync(IDialogContext context, IAwaitable<IMessageActivity> message, LuisResult result, IBotProvider provider)
         {
             IMessageActivity messageActivity;
 
             context.AssertNotNull(nameof(context));
             message.AssertNotNull(nameof(message));
             result.AssertNotNull(nameof(result));
-            service.AssertNotNull(nameof(service));
+            provider.AssertNotNull(nameof(provider));
 
             try
             {
                 messageActivity = await message;
 
                 await context.Forward(
-                    new QuestionDialog(service),
+                    new QuestionDialog(provider),
                     ResumeAfterQnA,
                     messageActivity,
                     CancellationToken.None);

@@ -4,18 +4,13 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Microsoft.Store.PartnerCenter.Bot.Logic
+namespace Microsoft.Store.PartnerCenter.Bot
 {
     /// <summary>
     /// Defines various constant value utilized by the bot.
     /// </summary>
     internal static class BotConstants
     {
-        /// <summary>
-        /// Name of the application used for identification purposes with the Partner Center API.
-        /// </summary>
-        public const string ApplicationName = "US HMSP - Partner Center Bot v0.5";
-
         /// <summary>
         /// Key utilized to access the authentication token stored in the user data.
         /// </summary>

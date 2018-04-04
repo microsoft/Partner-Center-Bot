@@ -1,33 +1,36 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="IBotService.cs" company="Microsoft">
+// <copyright file="IBotProvider.cs" company="Microsoft">
 //     Copyright (c) Microsoft Corporation. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Microsoft.Store.PartnerCenter.Bot.Logic
+namespace Microsoft.Store.PartnerCenter.Bot.Providers
 {
     using System.Threading.Tasks;
-    using Cache;
-    using Configuration;
     using Intents;
-    using Office;
-    using Security;
+    using Logic;
+    using Logic.Office;
     using Telemetry;
 
     /// <summary>
     /// Represents the core service that powers the application.
     /// </summary>
-    public interface IBotService
+    public interface IBotProvider
     {
+        /// <summary>
+        /// Gets the a reference to the token management service.
+        /// </summary>
+        IAccessTokenProvider AccessToken { get; }
+
         /// <summary>
         /// Gets the service that provides caching functionality.
         /// </summary>
-        ICacheService Cache { get; }
+        ICacheProvider Cache { get; }
 
         /// <summary>
         /// Gets a reference to the available configurations.
         /// </summary>
-        IConfiguration Configuration { get; }
+        IConfigurationProvider Configuration { get; }
 
         /// <summary>
         /// Gets a value indicating whether or the service has been initialized.
@@ -42,7 +45,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
         /// <summary>
         /// Gets the service that provides localization functionality.
         /// </summary>
-        ILocalizationService Localization { get; }
+        ILocalizationProvider Localization { get; }
 
         /// <summary>
         /// Gets a reference to the partner operations.
@@ -60,14 +63,9 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
         ITelemetryProvider Telemetry { get; }
 
         /// <summary>
-        /// Gets the a reference to the token management service.
-        /// </summary>
-        ITokenManagement TokenManagement { get; }
-
-        /// <summary>
         /// Gets a reference to the vault service. 
         /// </summary>
-        IVaultService Vault { get; }
+        IVaultProvider Vault { get; }
 
         /// <summary>
         /// Initializes the bot service and all the dependent services.

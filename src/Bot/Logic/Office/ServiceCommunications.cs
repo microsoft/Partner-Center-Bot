@@ -11,7 +11,9 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic.Office
     using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Threading.Tasks;
+    using Extensions;
     using Newtonsoft.Json;
+    using Providers;
 
     /// <summary>
     /// Provides the ability to interact with Office 365 Service Communications API.
@@ -21,19 +23,19 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic.Office
         /// <summary>
         /// Provides access to core services.
         /// </summary>
-        private readonly IBotService service;
+        private readonly IBotProvider provider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceCommunications" /> class.
         /// </summary>
-        /// <param name="service">Provides access to core services.</param>
+        /// <param name="provider">Provides access to core services.</param>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="service"/> is null.
+        /// <paramref name="provider"/> is null.
         /// </exception>
-        public ServiceCommunications(IBotService service)
+        public ServiceCommunications(IBotProvider provider)
         {
-            service.AssertNotNull(nameof(service));
-            this.service = service;
+            provider.AssertNotNull(nameof(provider));
+            this.provider = provider;
         }
 
         /// <summary>
@@ -60,7 +62,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic.Office
                 {
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-                    requestUri = $"{service.Configuration.OfficeManagementEndpoint}/api/v1.0/{customerId}/ServiceComms/CurrentStatus";
+                    requestUri = $"{provider.Configuration.OfficeManagementEndpoint}/api/v1.0/{customerId}/ServiceComms/CurrentStatus";
 
                     response = await client.GetAsync(requestUri);
                     content = await response.Content.ReadAsStringAsync();
@@ -86,7 +88,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic.Office
                         { "RequestUri", requestUri }
                     };
 
-                    service.Telemetry.TrackEvent("GetCurrentStatusAsync", eventProperties, eventMetrics);
+                    provider.Telemetry.TrackEvent("GetCurrentStatusAsync", eventProperties, eventMetrics);
 
                     return odataResponse.Value;
                 }

@@ -1,39 +1,39 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="LocalizationService.cs" company="Microsoft">
+// <copyright file="LocalizationProvider.cs" company="Microsoft">
 //     Copyright (c) Microsoft Corporation. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Microsoft.Store.PartnerCenter.Bot.Logic
+namespace Microsoft.Store.PartnerCenter.Bot.Providers
 {
     using System.Globalization;
     using System.Threading.Tasks;
     using PartnerCenter.Models.CountryValidationRules;
     using PartnerCenter.Models.Partners;
+    using Extensions;
 
     /// <summary>
     /// Provides localization for the bot.
     /// </summary>
-    /// <seealso cref="ILocalizationService" />
-    public class LocalizationService : ILocalizationService
+    /// <seealso cref="ILocalizationProvider" />
+    public class LocalizationProvider : ILocalizationProvider
     {
         /// <summary>
         /// Provides access to core application services.
         /// </summary>
-        private readonly IBotService service;
+        private readonly IBotProvider provider;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="LocalizationService"/> class.
+        /// Initializes a new instance of the <see cref="LocalizationProvider"/> class.
         /// </summary>
-        /// <param name="service">Provides access to core application services.</param>
+        /// <param name="provider">Provides access to core application services.</param>
         /// <exception cref="System.ArgumentNullException">
-        /// <paramref name="service"/> is null.
+        /// <paramref name="provider"/> is null.
         /// </exception>
-        public LocalizationService(IBotService service)
+        public LocalizationProvider(IBotProvider provider)
         {
-            service.AssertNotNull(nameof(service));
-
-            this.service = service;
+            provider.AssertNotNull(nameof(provider));
+            this.provider = provider;
         }
 
         /// <summary>
@@ -58,25 +58,27 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
             try
             {
                 // Obtain the business profile for the configured partner.
-                businessProfile = await this.service.PartnerOperations.GetLegalBusinessProfileAsync();
+                businessProfile = await provider.PartnerOperations
+                    .GetLegalBusinessProfileAsync().ConfigureAwait(false);
 
-                this.CountryIso2Code = businessProfile.Address.Country;
+                CountryIso2Code = businessProfile.Address.Country;
 
                 try
                 {
                     // Obtain the country validation rules for the configured partner.
-                    countryValidationRules = await this.service.PartnerOperations.GetCountryValidationRulesAsync(this.CountryIso2Code);
+                    countryValidationRules = await provider.PartnerOperations
+                        .GetCountryValidationRulesAsync(CountryIso2Code).ConfigureAwait(false);
 
-                    this.Locale = countryValidationRules.DefaultCulture;
+                    Locale = countryValidationRules.DefaultCulture;
                 }
                 catch
                 {
                     // Default the region to en-US.
-                    this.Locale = "en-US";
+                    Locale = "en-US";
                 }
 
                 // Set the culture to partner locale.
-                Resources.Culture = new CultureInfo(this.Locale);
+                Resources.Culture = new CultureInfo(Locale);
             }
             finally
             {

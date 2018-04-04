@@ -13,6 +13,8 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
     using Graph;
     using Models;
     using Security;
+    using Providers;
+    using Extensions;
 
     /// <summary>
     /// Provides the ability to interact with the Microsoft Graph.
@@ -23,7 +25,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
         /// <summary>
         /// Provides access to core application services.
         /// </summary>
-        private readonly IBotService service;
+        private readonly IBotProvider provider;
 
         /// <summary>
         /// Provides access to the Microsoft Graph API.
@@ -38,40 +40,40 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
         /// <summary>
         /// Initializes a new instance of the <see cref="GraphClient"/> class.
         /// </summary>
-        /// <param name="service">Provides access to core application services.</param>
+        /// <param name="provider">Provides access to core application services.</param>
         /// <param name="customerId">Identifier for customer whose resources are being accessed.</param>
         /// <exception cref="ArgumentException">
         /// <paramref name="customerId"/> is empty or null.
         /// </exception>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="service"/> is null.
+        /// <paramref name="provider"/> is null.
         /// </exception>
-        public GraphClient(IBotService service, string customerId)
+        public GraphClient(IBotProvider provider, string customerId)
         {
-            service.AssertNotNull(nameof(service));
+            provider.AssertNotNull(nameof(provider));
             customerId.AssertNotEmpty(nameof(customerId));
 
             this.customerId = customerId;
-            this.service = service;
-            client = new GraphServiceClient(new AuthenticationProvider(this.service, customerId));
+            this.provider = provider;
+            client = new GraphServiceClient(new AuthenticationProvider(this.provider, customerId));
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GraphClient"/> class.
         /// </summary>
-        /// <param name="service">Provides access to core application services.</param>
+        /// <param name="provider">Provides access to core application services.</param>
         /// <param name="client">Provides the ability to interact with the Microsoft Graph.</param>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="service"/> is null.
+        /// <paramref name="provider"/> is null.
         /// or
         /// <paramref name="client"/> is null.
         /// </exception>
-        public GraphClient(IBotService service, IGraphServiceClient client)
+        public GraphClient(IBotProvider provider, IGraphServiceClient client)
         {
-            service.AssertNotNull(nameof(service));
+            provider.AssertNotNull(nameof(provider));
             client.AssertNotNull(nameof(client));
 
-            this.service = service;
+            this.provider = provider;
             this.client = client;
         }
 
@@ -116,7 +118,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
                         }));
                     }
 
-                    if (customerId.Equals(service.Configuration.PartnerCenterApplicationTenantId))
+                    if (customerId.Equals(provider.Configuration.PartnerCenterAccountId))
                     {
                         groups = directoryGroups.CurrentPage.OfType<Group>().Where(
                             g => g.DisplayName.Equals("AdminAgents") || g.DisplayName.Equals("HelpdeskAgents") || g.DisplayName.Equals("SalesAgent")).ToList();
@@ -154,7 +156,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
                     { "NumberOfRoles", roles.Count }
                 };
 
-                service.Telemetry.TrackEvent("GetDirectoryRolesAsync", eventProperties, eventMeasurements);
+                provider.Telemetry.TrackEvent("GetDirectoryRolesAsync", eventProperties, eventMeasurements);
 
                 return roles;
             }
