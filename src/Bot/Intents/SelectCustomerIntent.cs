@@ -77,7 +77,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
                 startTime = DateTime.Now;
                 response = context.MakeMessage();
 
-                principal = await context.GetCustomerPrincipalAsync(provider);
+                principal = await context.GetCustomerPrincipalAsync(provider).ConfigureAwait(false);
 
                 if (result.TryFindEntity("identifier", out indentifierEntity))
                 {
@@ -93,11 +93,11 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
                 }
                 else
                 {
-                    customer = await provider.PartnerOperations.GetCustomerAsync(principal, customerId);
+                    customer = await provider.PartnerOperations.GetCustomerAsync(principal, customerId).ConfigureAwait(false);
                     response.Text = $"{Resources.CustomerContext} {customer.CompanyProfile.CompanyName}";
                 }
 
-                await context.PostAsync(response);
+                await context.PostAsync(response).ConfigureAwait(false);
 
                 // Capture the request for the customer summary for analysis.
                 eventProperties = new Dictionary<string, string>

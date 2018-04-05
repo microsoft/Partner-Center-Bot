@@ -7,7 +7,7 @@
 namespace Microsoft.Store.PartnerCenter.Bot.Extensions
 {
     using System.Collections.Generic;
-    using System.Web;
+    using System.Globalization;
     using Microsoft.Bot.Connector;
     using PartnerCenter.Models.Subscriptions;
 
@@ -20,21 +20,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Extensions
         /// <returns>An instance <see cref="Attachment"/> that represents the subscription.</returns>
         public static Attachment ToAttachment(this Subscription subscription)
         {
-            string imageUrl;
-            string offerName = subscription.OfferName.ToLower();
-
-            if (offerName.Contains("azure") || offerName.Contains("active directory"))
-            {
-                imageUrl = $"{HttpContext.Current.Request.Url.Scheme}://{HttpContext.Current.Request.Url.Host}:{HttpContext.Current.Request.Url.Port}/content/images/azure-logo.png";
-            }
-            else if (offerName.Contains("office") || offerName.Contains("365"))
-            {
-                imageUrl = $"{HttpContext.Current.Request.Url.Scheme}://{HttpContext.Current.Request.Url.Host}:{HttpContext.Current.Request.Url.Port}/content/images/office-logo.png";
-            }
-            else
-            {
-                imageUrl = $"{HttpContext.Current.Request.Url.Scheme}://{HttpContext.Current.Request.Url.Host}:{HttpContext.Current.Request.Url.Port}/content/images/microsoft-logo.png";
-            }
+            string offerName = subscription.OfferName.ToLower(CultureInfo.CurrentCulture);
 
             HeroCard card = new HeroCard
             {
@@ -45,13 +31,6 @@ namespace Microsoft.Store.PartnerCenter.Bot.Extensions
                         Title = Resources.SelectCaptial,
                         Type = ActionTypes.PostBack,
                         Value = $"select subscription {subscription.Id}"
-                    }
-                },
-                Images = new List<CardImage>
-                {
-                    new CardImage
-                    {
-                        Url = imageUrl
                     }
                 },
                 Subtitle = subscription.Id,

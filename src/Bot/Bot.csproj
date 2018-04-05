@@ -1,5 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\packages\Text.Analyzers.2.6.0\build\Text.Analyzers.props" Condition="Exists('..\..\packages\Text.Analyzers.2.6.0\build\Text.Analyzers.props')" />
+  <Import Project="..\..\packages\Microsoft.NetFramework.Analyzers.2.6.0\build\Microsoft.NetFramework.Analyzers.props" Condition="Exists('..\..\packages\Microsoft.NetFramework.Analyzers.2.6.0\build\Microsoft.NetFramework.Analyzers.props')" />
+  <Import Project="..\..\packages\Microsoft.NetCore.Analyzers.2.6.0\build\Microsoft.NetCore.Analyzers.props" Condition="Exists('..\..\packages\Microsoft.NetCore.Analyzers.2.6.0\build\Microsoft.NetCore.Analyzers.props')" />
+  <Import Project="..\..\packages\Microsoft.CodeQuality.Analyzers.2.6.0\build\Microsoft.CodeQuality.Analyzers.props" Condition="Exists('..\..\packages\Microsoft.CodeQuality.Analyzers.2.6.0\build\Microsoft.CodeQuality.Analyzers.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -161,8 +165,8 @@
     <Reference Include="Microsoft.Store.PartnerCenter.Models, Version=1.7.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.Store.PartnerCenter.1.7.1\lib\Net45\Microsoft.Store.PartnerCenter.Models.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.WindowsAzure.Storage, Version=9.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\WindowsAzure.Storage.9.1.0\lib\net45\Microsoft.WindowsAzure.Storage.dll</HintPath>
+    <Reference Include="Microsoft.WindowsAzure.Storage, Version=9.1.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\WindowsAzure.Storage.9.1.1\lib\net45\Microsoft.WindowsAzure.Storage.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -223,10 +227,6 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\Images\azure-logo.png" />
-    <Content Include="Content\Images\dynamics-logo.png" />
-    <Content Include="Content\Images\microsoft-logo.png" />
-    <Content Include="Content\Images\office-logo.png" />
     <Content Include="default.htm" />
     <Content Include="Global.asax" />
     <Content Include="Web.config">
@@ -246,7 +246,6 @@
     <Compile Include="Providers\ConfigurationProvider.cs" />
     <Compile Include="Providers\IConfigurationProvider.cs" />
     <Compile Include="Controllers\BaseApiController.cs" />
-    <Compile Include="Controllers\ImageController.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
     <Compile Include="Controllers\OAuthCallbackController.cs" />
     <Compile Include="Dialogs\ActionDialog.cs" />
@@ -268,12 +267,7 @@
     <Compile Include="Intents\SelectCustomerIntent.cs" />
     <Compile Include="Intents\SelectSubscriptionIntent.cs" />
     <Compile Include="Logic\AiExceptionLogger.cs" />
-    <Compile Include="Logic\CommunicationException.cs" />
     <Compile Include="Logic\IPartnerOperations.cs" />
-    <Compile Include="Logic\Office\HealthEvent.cs" />
-    <Compile Include="Logic\Office\IServiceCommunications.cs" />
-    <Compile Include="Logic\Office\ODataResponse.cs" />
-    <Compile Include="Logic\Office\ServiceCommunications.cs" />
     <Compile Include="Logic\OperationContext.cs" />
     <Compile Include="Logic\PartnerOperations.cs" />
     <Compile Include="Models\ApplicationCredential.cs" />
@@ -286,7 +280,7 @@
     <Compile Include="Providers\KeyVaultProvider.cs" />
     <Compile Include="Providers\RedisCacheprovider.cs" />
     <Compile Include="Security\AuthenticationProvider.cs" />
-    <Compile Include="Security\CustomBotAuthentication.cs" />
+    <Compile Include="Security\CustomBotAuthenticationAttribute.cs" />
     <Compile Include="Security\CustomerPrincipal.cs" />
     <Compile Include="Security\Permissions.cs" />
     <Compile Include="Security\UserRoles.cs" />
@@ -326,7 +320,16 @@
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Analyzer Include="..\..\packages\Microsoft.CodeQuality.Analyzers.2.6.0\analyzers\dotnet\cs\Microsoft.CodeQuality.Analyzers.dll" />
+    <Analyzer Include="..\..\packages\Microsoft.CodeQuality.Analyzers.2.6.0\analyzers\dotnet\cs\Microsoft.CodeQuality.CSharp.Analyzers.dll" />
+    <Analyzer Include="..\..\packages\Microsoft.NetCore.Analyzers.2.6.0\analyzers\dotnet\cs\Microsoft.NetCore.Analyzers.dll" />
+    <Analyzer Include="..\..\packages\Microsoft.NetCore.Analyzers.2.6.0\analyzers\dotnet\cs\Microsoft.NetCore.CSharp.Analyzers.dll" />
+    <Analyzer Include="..\..\packages\Microsoft.NetFramework.Analyzers.2.6.0\analyzers\dotnet\cs\Microsoft.NetFramework.Analyzers.dll" />
+    <Analyzer Include="..\..\packages\Microsoft.NetFramework.Analyzers.2.6.0\analyzers\dotnet\cs\Microsoft.NetFramework.CSharp.Analyzers.dll" />
+    <Analyzer Include="..\..\packages\Text.Analyzers.2.6.0\analyzers\dotnet\cs\Text.Analyzers.dll" />
+    <Analyzer Include="..\..\packages\Text.Analyzers.2.6.0\analyzers\dotnet\cs\Text.CSharp.Analyzers.dll" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.es.resx" />
     <EmbeddedResource Include="Resources.fr.resx" />
@@ -335,6 +338,16 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Bot.Models\Bot.Models.csproj">
+      <Project>{72cf9064-499f-456d-b879-e1335b2bd6ca}</Project>
+      <Name>Bot.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Bot.Services\Bot.Services.csproj">
+      <Project>{dd1b3ff6-0fac-41f6-843c-183676f55ad4}</Project>
+      <Name>Bot.Services</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -372,6 +385,10 @@
     <Error Condition="!Exists('..\..\packages\Microsoft.Azure.Services.AppAuthentication.1.1.0-preview\build\Microsoft.Azure.Services.AppAuthentication.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Azure.Services.AppAuthentication.1.1.0-preview\build\Microsoft.Azure.Services.AppAuthentication.targets'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.Azure.DocumentDB.1.21.1\build\Microsoft.Azure.DocumentDB.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Azure.DocumentDB.1.21.1\build\Microsoft.Azure.DocumentDB.targets'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.ApplicationInsights.SnapshotCollector.1.2.1\build\Microsoft.ApplicationInsights.SnapshotCollector.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.ApplicationInsights.SnapshotCollector.1.2.1\build\Microsoft.ApplicationInsights.SnapshotCollector.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.CodeQuality.Analyzers.2.6.0\build\Microsoft.CodeQuality.Analyzers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.CodeQuality.Analyzers.2.6.0\build\Microsoft.CodeQuality.Analyzers.props'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.NetCore.Analyzers.2.6.0\build\Microsoft.NetCore.Analyzers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.NetCore.Analyzers.2.6.0\build\Microsoft.NetCore.Analyzers.props'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.NetFramework.Analyzers.2.6.0\build\Microsoft.NetFramework.Analyzers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.NetFramework.Analyzers.2.6.0\build\Microsoft.NetFramework.Analyzers.props'))" />
+    <Error Condition="!Exists('..\..\packages\Text.Analyzers.2.6.0\build\Text.Analyzers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Text.Analyzers.2.6.0\build\Text.Analyzers.props'))" />
   </Target>
   <Import Project="..\..\packages\Microsoft.Azure.DocumentDB.1.21.1\build\Microsoft.Azure.DocumentDB.targets" Condition="Exists('..\..\packages\Microsoft.Azure.DocumentDB.1.21.1\build\Microsoft.Azure.DocumentDB.targets')" />
   <Import Project="..\..\packages\Microsoft.ApplicationInsights.SnapshotCollector.1.2.1\build\Microsoft.ApplicationInsights.SnapshotCollector.targets" Condition="Exists('..\..\packages\Microsoft.ApplicationInsights.SnapshotCollector.1.2.1\build\Microsoft.ApplicationInsights.SnapshotCollector.targets')" />

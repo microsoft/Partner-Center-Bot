@@ -77,14 +77,14 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
                 startTime = DateTime.Now;
                 response = context.MakeMessage();
 
-                principal = await context.GetCustomerPrincipalAsync(provider);
+                principal = await context.GetCustomerPrincipalAsync(provider).ConfigureAwait(false);
 
                 if (result.TryFindEntity("identifier", out indentifierEntity))
                 {
                     subscriptionId = indentifierEntity.Entity.Replace(" ", string.Empty);
                     principal.Operation.SubscriptionId = subscriptionId;
 
-                    subscription = await provider.PartnerOperations.GetSubscriptionAsync(principal);
+                    subscription = await provider.PartnerOperations.GetSubscriptionAsync(principal).ConfigureAwait(false);
 
                     if (subscription == null)
                     {
@@ -105,7 +105,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
                     response.Text = $"{Resources.SubscriptionContext} {subscriptionId}";
                 }
 
-                await context.PostAsync(response);
+                await context.PostAsync(response).ConfigureAwait(false);
 
                 // Track the event measurements for analysis.
                 eventMetrics = new Dictionary<string, double>

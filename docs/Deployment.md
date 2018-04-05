@@ -35,7 +35,7 @@ The bot requires an Azure AD application that grants privileges to Azure AD and 
 
 3. Click _+ Add_ to start the new application wizard
 4. Specify an appropriate name for the bot, select _Web app / API_ for the application, an appropriate value for the sign-on URL, and then click _Create_
-5. Click _Required permissions_ found on the settings blade for the the application and then click _+ Add_ 
+5. Click _Required permissions_ found on the settings blade for the application and then click _+ Add_ 
 6. Add the _Microsoft Graph_ API and grant it the _Read directory data_ application permission
 7. Add the _Partner Center API_  and grant it the _Access Partner Center PPE_ delegated permission
 
@@ -93,10 +93,6 @@ The following table provides details for the appropriate value for each of the p
 | Application Id                        | Identifier for the application created in the Azure AD Application section                               |
 | Application Secret                    | Secret key create in the step 9 of the Azure AD application section                                      |
 | Application Tenant Id                 | Identifier for the tenant where the application from the Azure AD Application was created                |
-| Key Vault App Cert Thumbprint         | Thumbprint of the certificated created in the Azure Key Vault section                                    |
-| Key Vault App Id                      | Identifier for the Azure AD application created in the Azure Key Vault section                           |
-| Key Vault Name                        | Name for the Key Vault. This name should not contain any special characters or spaces                    |
-| Key Vault Tenant Id                   | Identifier for the tenant where the instance of Azure Key Vault is being created                         |
 | LUIS App Id                           | Identifier for the LUIS application created in the *Create a New LUIS Application* section               |
 | LUIS App Key                          | Key for the LUIS application created in the *Create a New LUIS Application* section                      |
 | Microsoft App Id                      | Identifier of the application created in the *Register With the Bot Framework* section                   |
@@ -106,26 +102,3 @@ The following table provides details for the appropriate value for each of the p
 | Partner Center Application Tenat Id   | Account ID value obtained from the Partner Center Azure AD Application section                           |
 | QnA Knowledgebase Id                  | Identifier for the knowledgebase created in the *Create a New Instance of the QnA Service* section       |
 | QnA Subscription Key                  | Subscription key for the knowledgebase created in the *Create a New Instance of the QnA Service* section |
-
-## Configure Azure Key Vault Access Policy
-Now that the instance of Azure Key Vault has been provisioned you can add the access policy that will 
-enable the Azure AD application the ability to create, delete, and read secrets. Perform the following 
-to create the access policy
-
-1. Open PowerShell and install the [Azure AD PowerShell cmdlets](https://docs.microsoft.com/en-us/powershell/azure/install-adv2?view=azureadps-2.0)
-if you necessary
-2. Update the following cmdlets and then invoke them
-
-    ```powershell
-    Connect-AzureAD
-    Login-AzureRmAccount
-
-    ## Update these variable before invoking the rest of the cmdlets
-
-    # The value for the AppId should be the application identifier for the Azure AD application created for Key Vault
-    $spn = Get-AzureADServicePrincipal | ? {$_.AppId -eq 'b6b84568-6c01-4981-a80f-09da9a20bbed'}
-    $resourceGroupName = "ResourceGroupName"
-    $vaultName = "VaultName"
-
-    Set-AzureRmKeyVaultAccessPolicy -VaultName $vaultName -ObjectId $spn.Id -PermissionsToSecrets delete,get,set -ResourceGroupName $resourceGroupName
-    ```

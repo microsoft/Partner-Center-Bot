@@ -76,24 +76,24 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
             {
                 startTime = DateTime.Now;
 
-                principal = await context.GetCustomerPrincipalAsync(provider);
+                principal = await context.GetCustomerPrincipalAsync(provider).ConfigureAwait(false);
 
                 if (principal.CustomerId.Equals(provider.Configuration.PartnerCenterAccountId))
                 {
-                    customer = await provider.PartnerOperations.GetCustomerAsync(principal);
+                    customer = await provider.PartnerOperations.GetCustomerAsync(principal).ConfigureAwait(false);
 
                     response = context.MakeMessage();
                     response.Text = string.Format(Resources.SubscriptionRequestMessage, customer.CompanyProfile.CompanyName);
-                    await context.PostAsync(response);
+                    await context.PostAsync(response).ConfigureAwait(false);
                 }
 
-                subscriptions = await provider.PartnerOperations.GetSubscriptionsAsync(principal);
+                subscriptions = await provider.PartnerOperations.GetSubscriptionsAsync(principal).ConfigureAwait(false);
 
                 response = context.MakeMessage();
                 response.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                 response.Attachments = subscriptions.Select(s => s.ToAttachment()).ToList();
 
-                await context.PostAsync(response);
+                await context.PostAsync(response).ConfigureAwait(false);
 
                 // Track the event measurements for analysis.
                 eventMetrics = new Dictionary<string, double>

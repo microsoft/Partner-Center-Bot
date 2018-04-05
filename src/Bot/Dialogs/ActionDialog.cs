@@ -64,7 +64,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
             {
                 message = context.MakeMessage();
 
-                principal = await context.GetCustomerPrincipalAsync(provider);
+                principal = await context.GetCustomerPrincipalAsync(provider).ConfigureAwait(false);
 
                 if (principal == null)
                 {
@@ -81,7 +81,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
                     message.Text = builder.ToString();
                 }
 
-                await context.PostAsync(message);
+                await context.PostAsync(message).ConfigureAwait(false);
                 context.Wait(MessageReceived);
             }
             finally
@@ -113,22 +113,22 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
             {
                 key = result.TopScoringIntent.Intent.ToCamelCase();
 
-                principal = await context.GetCustomerPrincipalAsync(provider);
+                principal = await context.GetCustomerPrincipalAsync(provider).ConfigureAwait(false);
 
                 if (principal == null)
                 {
-                    await HelpAsync(context);
+                    await HelpAsync(context).ConfigureAwait(false);
                     return;
                 }
 
                 if (principal.AvailableIntents.ContainsKey(key))
                 {
                     await principal.AvailableIntents[key]
-                        .ExecuteAsync(context, message, result, provider);
+                        .ExecuteAsync(context, message, result, provider).ConfigureAwait(false);
                 }
                 else
                 {
-                    await HelpAsync(context);
+                    await HelpAsync(context).ConfigureAwait(false);
                 }
             }
             finally
@@ -157,15 +157,15 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
                         new AuthDialog(provider, message),
                         ResumeAfterAuth,
                         message,
-                        CancellationToken.None);
+                        CancellationToken.None).ConfigureAwait(false);
                 }
                 else if (message.Text.Equals(Resources.Help, StringComparison.CurrentCultureIgnoreCase))
                 {
-                    await HelpAsync(context);
+                    await HelpAsync(context).ConfigureAwait(false);
                 }
                 else
                 {
-                    await base.MessageReceived(context, item);
+                    await base.MessageReceived(context, item).ConfigureAwait(false);
                 }
             }
             finally
@@ -191,9 +191,9 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
             result.AssertNotNull(nameof(result));
 
             string message = await result;
-            await context.PostAsync(message);
+            await context.PostAsync(message).ConfigureAwait(false);
 
-            await HelpAsync(context);
+            await HelpAsync(context).ConfigureAwait(false);
         }
     }
 }

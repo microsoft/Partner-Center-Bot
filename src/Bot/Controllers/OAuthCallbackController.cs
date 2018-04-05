@@ -94,7 +94,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
                 using (ILifetimeScope scope = DialogModule.BeginLifetimeScope(Conversation.Container, message))
                 {
                     botData = scope.Resolve<IBotData>();
-                    await botData.LoadAsync(cancellationToken);
+                    await botData.LoadAsync(cancellationToken).ConfigureAwait(false);
 
                     if (!Validate(botData, stateData))
                     {
@@ -103,12 +103,14 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
                             new InvalidOperationException(Resources.InvalidAuthenticationException));
                     }
 
-                    principal = await GetCustomerPrincipalAsync(code);
+                    principal = await GetCustomerPrincipalAsync(
+                        new Uri($"{Request.RequestUri.Scheme}://{Request.RequestUri.Host}:{Request.RequestUri.Port}/{BotConstants.CallbackPath}"),
+                        code).ConfigureAwait(false);
 
                     if (principal == null)
                     {
                         message.Text = Resources.NoRelationshipException;
-                        await Conversation.ResumeAsync(conversationReference, message, cancellationToken);
+                        await Conversation.ResumeAsync(conversationReference, message, cancellationToken).ConfigureAwait(false);
 
                         return Request.CreateErrorResponse(
                             HttpStatusCode.BadRequest,
@@ -117,8 +119,8 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
 
                     botData.PrivateConversationData.SetValue(BotConstants.CustomerPrincipalKey, principal);
 
-                    await botData.FlushAsync(cancellationToken);
-                    await Conversation.ResumeAsync(conversationReference, message, cancellationToken);
+                    await botData.FlushAsync(cancellationToken).ConfigureAwait(false);
+                    await Conversation.ResumeAsync(conversationReference, message, cancellationToken).ConfigureAwait(false);
 
                     // Capture the request for the customer summary for analysis.
                     eventProperties = new Dictionary<string, string>
@@ -164,41 +166,38 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
         /// <summary>
         /// Obtain an instance of <see cref="CustomerPrincipal"/> that represents the authenticated user.
         /// </summary>
+        /// <param name="redirectUri">Address to return to upon receiving a response from the authority.</param>
         /// <param name="code">The authorization code that was requested.</param>
         /// <returns>An instance of <see cref="CustomerPrincipal"/> that represents the authenticated user.</returns>
         /// <exception cref="ArgumentException">
         /// <paramref name="code"/> is empty or null.
         /// </exception>
-        private async Task<CustomerPrincipal> GetCustomerPrincipalAsync(string code)
+        private async Task<CustomerPrincipal> GetCustomerPrincipalAsync(Uri redirectUri, string code)
         {
             AuthenticationResult authResult;
             CustomerPrincipal principal;
             IGraphClient client;
             List<RoleModel> roles;
-            Uri redirectUri;
 
             code.AssertNotEmpty(nameof(code));
 
             try
             {
-                redirectUri =
-                    new Uri($"{HttpContext.Current.Request.Url.Scheme}://{HttpContext.Current.Request.Url.Host}:{HttpContext.Current.Request.Url.Port}/{BotConstants.CallbackPath}");
-
                 authResult = await Provider.AccessToken.AcquireTokenByAuthorizationCodeAsync(
                     $"{Provider.Configuration.ActiveDirectoryEndpoint}/{BotConstants.AuthorityEndpoint}",
                     code,
                     new ApplicationCredential
                     {
-                        ApplicationId = Provider.Configuration.ApplicationId, 
-                        ApplicationSecret = Provider.Configuration.ApplicationSecret, 
+                        ApplicationId = Provider.Configuration.ApplicationId,
+                        ApplicationSecret = Provider.Configuration.ApplicationSecret,
                         UseCache = true
                     },
                     redirectUri,
-                    Provider.Configuration.GraphEndpoint);
+                    Provider.Configuration.GraphEndpoint).ConfigureAwait(false);
 
                 client = new GraphClient(Provider, authResult.TenantId);
 
-                roles = await client.GetDirectoryRolesAsync(authResult.UserInfo.UniqueId);
+                roles = await client.GetDirectoryRolesAsync(authResult.UserInfo.UniqueId).ConfigureAwait(false);
 
                 principal = new CustomerPrincipal
                 {
@@ -219,7 +218,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
                     authResult.TenantId,
                     StringComparison.CurrentCultureIgnoreCase))
                 {
-                    await Provider.PartnerOperations.GetCustomerAsync(principal, authResult.TenantId);
+                    await Provider.PartnerOperations.GetCustomerAsync(principal, authResult.TenantId).ConfigureAwait(false);
                 }
 
                 return principal;
@@ -236,6 +235,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
             finally
             {
                 authResult = null;
+                client = null;
                 roles = null;
             }
         }
@@ -251,7 +251,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
         /// or 
         /// <paramref name="stateData"/> is null.
         /// </exception>
-        private bool Validate(IBotData botData, IDictionary<string, string> stateData)
+        private static bool Validate(IBotData botData, IDictionary<string, string> stateData)
         {
             string uniqueId;
 

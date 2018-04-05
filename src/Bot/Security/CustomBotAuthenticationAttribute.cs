@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="CustomBotAuthentication.cs" company="Microsoft">
+// <copyright file="CustomBotAuthenticationAttribute.cs" company="Microsoft">
 //     Copyright (c) Microsoft Corporation. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -14,13 +14,13 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
     using Extensions;
     using Microsoft.Bot.Connector;
     using Providers;
-    
+
     /// <summary>
     /// Provides custom authentication for the bot itself.
     /// </summary>
     /// <seealso cref="BotAuthentication" />
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public class CustomBotAuthentication : BotAuthentication
+    public sealed class CustomBotAuthenticationAttribute : BotAuthentication
     {
         /// <summary>
         ///  Occurs before the action method is invoked.

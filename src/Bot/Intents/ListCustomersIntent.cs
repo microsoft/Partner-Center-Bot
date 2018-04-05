@@ -10,14 +10,13 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using System.Web;
     using Extensions;
     using Microsoft.Bot.Builder.Dialogs;
     using Microsoft.Bot.Builder.Luis.Models;
     using Microsoft.Bot.Connector;
     using PartnerCenter.Models.Customers;
-    using Security;
     using Providers;
+    using Security;
 
     /// <summary>
     /// Processes the request to list customers.
@@ -76,9 +75,9 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
             {
                 startTime = DateTime.Now;
 
-                principal = await context.GetCustomerPrincipalAsync(provider);
+                principal = await context.GetCustomerPrincipalAsync(provider).ConfigureAwait(false);
 
-                customers = await provider.PartnerOperations.GetCustomersAsync(principal);
+                customers = await provider.PartnerOperations.GetCustomersAsync(principal).ConfigureAwait(false);
 
                 response = context.MakeMessage();
                 response.AttachmentLayout = AttachmentLayoutTypes.Carousel;
@@ -94,18 +93,11 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
                             Value = $"select customer {c.Id}"
                         }
                     },
-                    Images = new List<CardImage>
-                    {
-                        new CardImage
-                        {
-                            Url = $"{HttpContext.Current.Request.Url.Scheme}://{HttpContext.Current.Request.Url.Host}:{HttpContext.Current.Request.Url.Port}/api/images/dynamic?value={HttpUtility.UrlEncode(c.CompanyProfile.CompanyName)}"
-                        }
-                    },
                     Subtitle = c.CompanyProfile.Domain,
                     Title = c.CompanyProfile.CompanyName
                 }).ToAttachment()).ToList();
 
-                await context.PostAsync(response);
+                await context.PostAsync(response).ConfigureAwait(false);
 
                 // Capture the request for the customer summary for analysis.
                 eventProperties = new Dictionary<string, string>

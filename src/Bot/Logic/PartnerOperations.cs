@@ -92,7 +92,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
             {
                 startTime = DateTime.Now;
                 correlationId = Guid.NewGuid();
-                operations = await GetAppOperationsAsync(correlationId);
+                operations = await GetAppOperationsAsync(correlationId).ConfigureAwait(false);
 
                 rules = await operations.CountryValidationRules.ByCountry(countryCode).GetAsync().ConfigureAwait(false);
 
@@ -159,7 +159,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
             {
                 startTime = DateTime.Now;
                 correlationId = Guid.NewGuid();
-                operations = await GetAppOperationsAsync(correlationId);
+                operations = await GetAppOperationsAsync(correlationId).ConfigureAwait(false);
 
                 if (principal.CustomerId.Equals(provider.Configuration.PartnerCenterAccountId))
                 {
@@ -223,7 +223,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
             {
                 startTime = DateTime.Now;
                 correlationId = Guid.NewGuid();
-                operations = await GetAppOperationsAsync(correlationId);
+                operations = await GetAppOperationsAsync(correlationId).ConfigureAwait(false);
 
                 customers = new List<Customer>();
 
@@ -299,7 +299,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
 
                 startTime = DateTime.Now;
                 correlationId = Guid.NewGuid();
-                operations = await GetAppOperationsAsync(correlationId);
+                operations = await GetAppOperationsAsync(correlationId).ConfigureAwait(false);
 
                 profile = await operations.Profiles.LegalBusinessProfile.GetAsync().ConfigureAwait(false);
 
@@ -357,7 +357,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
             {
                 startTime = DateTime.Now;
                 correlationId = Guid.NewGuid();
-                operations = await GetAppOperationsAsync(correlationId);
+                operations = await GetAppOperationsAsync(correlationId).ConfigureAwait(false);
 
                 try
                 {
@@ -421,16 +421,17 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
             {
                 startTime = DateTime.Now;
                 correlationId = Guid.NewGuid();
-                operations = await GetAppOperationsAsync(correlationId);
+                operations = await GetAppOperationsAsync(correlationId).ConfigureAwait(false);
 
                 if (principal.CustomerId.Equals(provider.Configuration.PartnerCenterAccountId))
                 {
                     principal.AssertValidCustomerContext(Resources.InvalidCustomerContextException);
-                    subscriptions = await operations.Customers.ById(principal.Operation.CustomerId).Subscriptions.GetAsync();
+                    subscriptions = await operations.Customers
+                        .ById(principal.Operation.CustomerId).Subscriptions.GetAsync().ConfigureAwait(false);
                 }
                 else
                 {
-                    subscriptions = await operations.Customers.ById(principal.CustomerId).Subscriptions.GetAsync();
+                    subscriptions = await operations.Customers.ById(principal.CustomerId).Subscriptions.GetAsync().ConfigureAwait(false);
                 }
 
                 // Track the event measurements for analysis.
@@ -514,7 +515,8 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
                 provider.Configuration.PartnerCenterApplicationSecret.ToUnsecureString(),
                 provider.Configuration.PartnerCenterAccountId).ConfigureAwait(false);
 
-            await provider.Cache.StoreAsync(CacheDatabaseType.Authentication, PartnerCenterCacheKey, credentials).ConfigureAwait(false);
+            await provider.Cache
+                .StoreAsync(CacheDatabaseType.Authentication, PartnerCenterCacheKey, credentials).ConfigureAwait(false);
 
             return credentials;
         }

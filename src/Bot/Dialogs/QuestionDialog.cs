@@ -84,7 +84,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
 
                 if (!string.IsNullOrEmpty(message?.Text))
                 {
-                    result = await QnAService.QueryServiceAsync(message.Text);
+                    result = await QnAService.QueryServiceAsync(message.Text).ConfigureAwait(false);
                 }
 
                 message = context.MakeMessage();

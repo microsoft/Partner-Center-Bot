@@ -235,7 +235,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Providers
                     clientId,
                     redirectUri,
                     UserIdentifier.AnyUser,
-                    extraQueryParameters);
+                    extraQueryParameters).ConfigureAwait(false);
 
                 return authUri.ToString();
             }

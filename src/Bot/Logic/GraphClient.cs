@@ -102,7 +102,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
             {
                 startTime = DateTime.Now;
 
-                directoryGroups = await client.Users[objectId].MemberOf.Request().GetAsync();
+                directoryGroups = await client.Users[objectId].MemberOf.Request().GetAsync().ConfigureAwait(false);
                 roles = new List<RoleModel>();
 
                 do
@@ -118,7 +118,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
                         }));
                     }
 
-                    if (customerId.Equals(provider.Configuration.PartnerCenterAccountId))
+                    if (customerId.Equals(provider.Configuration.PartnerCenterAccountId, StringComparison.InvariantCultureIgnoreCase))
                     {
                         groups = directoryGroups.CurrentPage.OfType<Group>().Where(
                             g => g.DisplayName.Equals("AdminAgents") || g.DisplayName.Equals("HelpdeskAgents") || g.DisplayName.Equals("SalesAgent")).ToList();
@@ -137,7 +137,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
 
                     if (morePages)
                     {
-                        directoryGroups = await directoryGroups.NextPageRequest.GetAsync();
+                        directoryGroups = await directoryGroups.NextPageRequest.GetAsync().ConfigureAwait(false);
                     }
                 }
                 while (morePages);

@@ -12,10 +12,10 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
     using System.Threading.Tasks;
     using Extensions;
     using IdentityModel.Clients.ActiveDirectory;
-    using Logic.Office;
     using Microsoft.Bot.Builder.Dialogs;
     using Microsoft.Bot.Builder.Luis.Models;
     using Microsoft.Bot.Connector;
+    using Services;
     using Models;
     using Providers;
     using Security;
@@ -60,13 +60,13 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
         /// </exception>
         public async Task ExecuteAsync(IDialogContext context, IAwaitable<IMessageActivity> message, LuisResult result, IBotProvider provider)
         {
-            AuthenticationResult authResult;
             CustomerPrincipal principal;
             DateTime startTime;
             Dictionary<string, double> eventMetrics;
             Dictionary<string, string> eventProperties;
             IMessageActivity response;
-            List<HealthEvent> healthEvents;
+            List<OfficeHealthEvent> healthEvents;
+            ServiceCommunications serviceComm;
             string authority;
             string customerId;
 
@@ -79,7 +79,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
             {
                 startTime = DateTime.Now;
 
-                principal = await context.GetCustomerPrincipalAsync(provider);
+                principal = await context.GetCustomerPrincipalAsync(provider).ConfigureAwait(false);
 
                 if (principal.CustomerId.Equals(provider.Configuration.PartnerCenterAccountId, StringComparison.CurrentCultureIgnoreCase))
                 {
@@ -94,25 +94,21 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
                     customerId = principal.CustomerId;
                 }
 
-                authResult = await provider.AccessToken.GetAccessTokenAsync(
-                    $"{provider.Configuration.ActiveDirectoryEndpoint}/{principal.Operation.CustomerId}",
-                    provider.Configuration.OfficeManagementEndpoint,
-                    new ApplicationCredential
-                    {
-                        ApplicationId = provider.Configuration.ApplicationId,
-                        ApplicationSecret = provider.Configuration.ApplicationSecret,
-                        UseCache = true
-                    });
+                serviceComm = new ServiceCommunications(
+                    new Uri(provider.Configuration.OfficeManagementEndpoint),
+                    new ServiceCredentials(
+                        provider.Configuration.ApplicationId,
+                        provider.Configuration.ApplicationSecret.ToUnsecureString(),
+                        provider.Configuration.OfficeManagementEndpoint,
+                        principal.Operation.CustomerId));
 
-                healthEvents = await provider.ServiceCommunications.GetCurrentStatusAsync(
-                    customerId,
-                    authResult.AccessToken);
+                healthEvents = await serviceComm.GetHealthEventsAsync(principal.Operation.CustomerId).ConfigureAwait(false);
 
                 response = context.MakeMessage();
                 response.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                 response.Attachments = healthEvents.Select(e => e.ToAttachment()).ToList();
 
-                await context.PostAsync(response);
+                await context.PostAsync(response).ConfigureAwait(false);
 
                 // Track the event measurements for analysis.
                 eventMetrics = new Dictionary<string, double>
@@ -139,7 +135,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
 
                 provider.Telemetry.TrackException(ex);
 
-                await context.PostAsync(response);
+                await context.PostAsync(response).ConfigureAwait(false);
             }
             finally
             {
@@ -147,6 +143,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
                 eventProperties = null;
                 principal = null;
                 response = null;
+                serviceComm = null;
             }
         }
     }

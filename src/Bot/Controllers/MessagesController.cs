@@ -67,13 +67,13 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
                                 Provider.Configuration.MicrosoftAppId,
                                 Provider.Configuration.MicrosoftAppPassword.ToUnsecureString()));
 
-                        await client.Conversations.ReplyToActivityAsync(activity.CreateReply(Resources.Welcome));
+                        await client.Conversations.ReplyToActivityAsync(activity.CreateReply(Resources.Welcome)).ConfigureAwait(false);
                     }
                 }
 
                 if (activity.Type == ActivityTypes.Message)
                 {
-                    await Conversation.SendAsync(activity, () => new ActionDialog(Provider));
+                    await Conversation.SendAsync(activity, () => new ActionDialog(Provider)).ConfigureAwait(false);
                 }
 
                 // Capture the request for the customer summary for analysis.

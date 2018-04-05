@@ -51,7 +51,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Providers
         /// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
         public async Task ClearAsync(CacheDatabaseType database)
         {
-            await Task.FromResult(0);
+            await Task.FromResult(0).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -65,8 +65,8 @@ namespace Microsoft.Store.PartnerCenter.Bot.Providers
         /// </exception>
         public async Task DeleteAsync(CacheDatabaseType database, string key = null)
         {
-            IDatabase cache = await GetCacheReferenceAsync(database);
-            await cache.KeyDeleteAsync(key);
+            IDatabase cache = await GetCacheReferenceAsync(database).ConfigureAwait(false);
+            await cache.KeyDeleteAsync(key).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -107,8 +107,8 @@ namespace Microsoft.Store.PartnerCenter.Bot.Providers
         {
             key.AssertNotEmpty(nameof(key));
 
-            IDatabase cache = await GetCacheReferenceAsync(database);
-            RedisValue value = await cache.StringGetAsync(key);
+            IDatabase cache = await GetCacheReferenceAsync(database).ConfigureAwait(false);
+            RedisValue value = await cache.StringGetAsync(key).ConfigureAwait(false);
 
             return value.HasValue ? DecompressEntity<TEntity>(value) : null;
         }
@@ -134,10 +134,10 @@ namespace Microsoft.Store.PartnerCenter.Bot.Providers
             key.AssertNotEmpty(nameof(key));
             entity.AssertNotNull(nameof(entity));
 
-            IDatabase cache = await GetCacheReferenceAsync(database);
+            IDatabase cache = await GetCacheReferenceAsync(database).ConfigureAwait(false);
 
             await cache.StringSetAsync(
-                key, CompressEntity(entity), expiration);
+                key, CompressEntity(entity), expiration).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -287,7 +287,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Providers
             if (connection == null)
             {
                 connection = await ConnectionMultiplexer.ConnectAsync(
-                    provider.Configuration.RedisCacheConnectionString.ToUnsecureString());
+                    provider.Configuration.RedisCacheConnectionString.ToUnsecureString()).ConfigureAwait(false);
             }
 
             return connection.GetDatabase((int)database);

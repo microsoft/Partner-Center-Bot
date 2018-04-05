@@ -6,7 +6,7 @@
 
 namespace Microsoft.Store.PartnerCenter.Bot.Extensions
 {
-    using Logic.Office;
+    using Models;
     using Microsoft.Bot.Connector;
 
     public static class HealthEventExtensions
@@ -16,7 +16,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Extensions
         /// </summary>
         /// <param name="healthEvent">An instance of <see cref="HealthEvent"/> to be transformed.</param>
         /// <returns>An instance of <see cref="Attachment"/> that represents the health event.</returns>
-        public static Attachment ToAttachment(this HealthEvent healthEvent)
+        public static Attachment ToAttachment(this OfficeHealthEvent healthEvent)
         {
             HeroCard card = new HeroCard
             {

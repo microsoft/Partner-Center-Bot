@@ -9,7 +9,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Providers
     using System.Threading.Tasks;
     using Intents;
     using Logic;
-    using Logic.Office;
+    using Services;
     using Telemetry;
 
     /// <summary>
@@ -51,11 +51,6 @@ namespace Microsoft.Store.PartnerCenter.Bot.Providers
         /// Gets a reference to the partner operations.
         /// </summary>
         IPartnerOperations PartnerOperations { get; }
-
-        /// <summary>
-        /// Gets a reference t the service communications service.
-        /// </summary>
-        IServiceCommunications ServiceCommunications { get; }
 
         /// <summary>
         /// Gets the telemetry service reference.

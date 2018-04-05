@@ -10,7 +10,6 @@ namespace Microsoft.Store.PartnerCenter.Bot.Providers
     using System.Threading.Tasks;
     using Intents;
     using Logic;
-    using Logic.Office;
     using Telemetry;
 
     /// <summary>
@@ -54,12 +53,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Providers
         /// Provides the ability to perform various partner operations.
         /// </summary>
         private static IPartnerOperations partnerOperations;
-
-        /// <summary>
-        /// Provides the ability to communicate with the Office 365 Service Communications API.
-        /// </summary>
-        private static IServiceCommunications serviceCommunications;
-
+        
         /// <summary>
         /// Provides the ability to track telemetry data.
         /// </summary>
@@ -106,11 +100,6 @@ namespace Microsoft.Store.PartnerCenter.Bot.Providers
         public IPartnerOperations PartnerOperations => partnerOperations ?? (partnerOperations = new PartnerOperations(this));
 
         /// <summary>
-        /// Gets the ability to communicate with the Office 365 Service Communications API.
-        /// </summary>
-        public IServiceCommunications ServiceCommunications => serviceCommunications ?? (serviceCommunications = new ServiceCommunications(this));
-
-        /// <summary>
         /// Gets the telemetry service reference.
         /// </summary>
         public ITelemetryProvider Telemetry
@@ -152,7 +141,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Providers
             intent.Initialize();
 
             await Configuration.InitializeAsync().ConfigureAwait(false);
-            await localization.InitializeAsync().ConfigureAwait(false); 
+            await localization.InitializeAsync().ConfigureAwait(false);
         }
     }
 }

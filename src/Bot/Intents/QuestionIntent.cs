@@ -71,7 +71,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
                     new QuestionDialog(provider),
                     ResumeAfterQnA,
                     messageActivity,
-                    CancellationToken.None);
+                    CancellationToken.None).ConfigureAwait(false);
             }
             finally
             {
@@ -92,7 +92,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
             try
             {
                 messageActivity = await result;
-                await context.PostAsync(messageActivity);
+                await context.PostAsync(messageActivity).ConfigureAwait(false);
             }
             finally
             {

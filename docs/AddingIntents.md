@@ -1,7 +1,6 @@
 # Adding New Intents
-The [Language Understanding Intelligent Service (LUIS)](http://luis.ai) provides the ability to process conversational information 
-and extract an intent from that information. This ability enables us to map sentences received to a particular function defined with in the 
-[_ActionDialog_](https://github.com/Microsoft/Partner-Center-Bot/blob/master/src/Bot/Dialogs/ActionDialog.cs) class. As an example if an authenticated 
+The [Language Understanding Intelligent Service (LUIS)](http://luis.ai) provides the ability to process conversational information and extract an intent from that information. This ability enables us to map sentences received to a particular function defined within the 
+[_ActionDialog_](https://github.com/Microsoft/Partner-Center-Bot/blob/master/src/Bot/Dialogs/ActionDialog.cs) class. As an example, if an authenticated 
 user sends _list customers_ this will be processed by LUIS and eventually mapped to the [_ExecuteAsync_](https://github.com/Microsoft/Partner-Center-Bot/blob/master/src/Bot/Intents/ListCustomersIntent.cs#L61)
 function defined in the [_ListCustomerIntnent_](https://github.com/Microsoft/Partner-Center-Bot/blob/master/src/Bot/Intents/ListCustomersIntent.cs) class.
 
@@ -17,18 +16,18 @@ The following logic is utilized to properly route the intent to the appropriate 
 ```csharp
 key = result.TopScoringIntent.Intent.ToCamelCase();
 
-principal = await context.GetCustomerPrincipalAsync(this.service);
+principal = await context.GetCustomerPrincipalAsync(this.service).ConfigureAwait(false);
 
 if (principal == null)
 {
-    await this.HelpAsync(context);
+    await this.HelpAsync(context).ConfigureAwait(false);
     return;
 }
 
 if (principal.AvailableIntents.ContainsKey(key))
 {
     await principal.AvailableIntents[key]
-        .ExecuteAsync(context, message, result, this.service);
+        .ExecuteAsync(context, message, result, this.service).ConfigureAwait(false);
 }
 else
 {
@@ -37,8 +36,7 @@ else
 ```
 
 First the code will verify that the user has successfully authenticated. This is accomplished by extracting the [_CustomerPrincipal_](https://github.com/Microsoft/Partner-Center-Bot/blob/master/src/Bot/Security/CustomerPrincipal.cs)
-from the private conversation data. If that object is not present in the private conversation data that means the user has not authenticated. Second the code will verify the intent exists in the dictionary of available intents for the 
-authenticated user. The dictionary of availalbe intents is generated in the [_GetCustomerPrincipalAsync_](https://github.com/Microsoft/Partner-Center-Bot/blob/master/src/Bot/Controllers/OAuthCallbackController.cs#L191) function 
+from the private conversation data. If that object is not present in the private conversation data that means the user has not authenticated. Second, the code will verify the intent exists in the dictionary of available intents for the authenticated user. The dictionary of available intents is generated in the [_GetCustomerPrincipalAsync_](https://github.com/Microsoft/Partner-Center-Bot/blob/master/src/Bot/Controllers/OAuthCallbackController.cs#L191) function 
 defined in the [_OAuthCallbackController_](https://github.com/Microsoft/Partner-Center-Bot/blob/master/src/Bot/Controllers/OAuthCallbackController.cs#L191) class.
 
 ```csharp
@@ -52,10 +50,10 @@ AvailableIntents = (from intent in this.Service.Intent.Intents
 This LINQ statement will create a dictionary that contains a reference to classes that implement the [_IIntent_](https://github.com/Microsoft/Partner-Center-Bot/blob/master/src/Bot/Intents/IIntent.cs) interface where the user has the appropriate privileges.
 
 ## Creating A New Intent
-New intents will need to be defined within the LUIS application and then through code. Perform the following tasksto create a new intent within LUIS
+New intents will need to be defined within the LUIS application and then through code. Perform the following tasks to create a new intent within LUIS
 
-1. Login into the [LUIS portal](http://luis.ai) and import the [_Partner-Center-Bot_](https://github.com/Microsoft/Partner-Center-Bot/blob/master/Partner-Center-Bot.json) application if you have not already
-2. Select the _Partner-Center-Bot_ application and then click the _Intents_ link found on the left hand size of the dashboard
+1. Login to the [LUIS portal](http://luis.ai) and import the [_Partner-Center-Bot_](https://github.com/Microsoft/Partner-Center-Bot/blob/master/Partner-Center-Bot.json) application if you have not already
+2. Select the _Partner-Center-Bot_ application and then click the _Intents_ link found on the left-hand side of the dashboard
 3. Click the _Add Intent_ button and then specify an appropriate name and then click _Save_
 
     ![Add a new intent](Images/luis01.png)
@@ -64,9 +62,8 @@ New intents will need to be defined within the LUIS application and then through
 
     ![Adding utterances to an intent](Images/luis02.png)
 
-If you would like to learn more about the various configurations then check out [_Add Intents_](https://github.com/Microsoft/Cognitive-Documentation/blob/master/Content/en-us/LUIS/Add-intents.md) from the LUIS documentation. Next you will need add a new class to the [_Intent_](https://github.com/Microsoft/Partner-Center-Bot/tree/master/src/Bot/Intents) directory that implements the 
-[_IIntent_](https://github.com/Microsoft/Partner-Center-Bot/blob/master/src/Bot/Intents/IIntent.cs) interface. By doing this all of the required functions and properties will 
-be defined. The following code is a sample of what the new intent should look like.  
+If you would like to learn more about the various configurations then check out [_Add Intents_](https://github.com/Microsoft/Cognitive-Documentation/blob/master/Content/en-us/LUIS/Add-intents.md) from the LUIS documentation. Next, you will need to add a new class to the [_Intent_](https://github.com/Microsoft/Partner-Center-Bot/tree/master/src/Bot/Intents) directory that implements the 
+[_IIntent_](https://github.com/Microsoft/Partner-Center-Bot/blob/master/src/Bot/Intents/IIntent.cs) interface. By doing this all of the required functions and properties will be defined. The following code is a sample of what the new intent should look like.  
 
 ```csharp
 // -----------------------------------------------------------------------
@@ -145,11 +142,11 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
                 correlationId = Guid.NewGuid();
                 response = context.MakeMessage();
 
-                principal = await context.GetCustomerPrincipalAsync(service);
+                principal = await context.GetCustomerPrincipalAsync(service).ConfigureAwait(false);
 
                 response.Text = "This is sample intent.";
 
-                await context.PostAsync(response);
+                await context.PostAsync(response).ConfigureAwait(false);
 
                 // Capture the request for the customer summary for analysis.
                 eventProperties = new Dictionary<string, string>

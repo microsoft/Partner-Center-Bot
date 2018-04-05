@@ -1,17 +1,14 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="HealthEvent.cs" company="Microsoft">
+// <copyright file="OfficeHealthEvent.cs" company="Microsoft">
 //     Copyright (c) Microsoft Corporation. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Microsoft.Store.PartnerCenter.Bot.Logic.Office
+namespace Microsoft.Store.PartnerCenter.Bot.Models
 {
-    using System;
+    using System; 
 
-    /// <summary>
-    /// Represents a health event obtained from Office 365 Service Communications API.
-    /// </summary>
-    public class HealthEvent
+    public class OfficeHealthEvent
     {
         /// <summary>
         /// Gets or sets the identifier.

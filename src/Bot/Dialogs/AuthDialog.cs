@@ -64,7 +64,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
         public async Task StartAsync(IDialogContext context)
         {
             context.AssertNotNull(nameof(context));
-            await AuthenticateAsync(context);
+            await AuthenticateAsync(context).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -123,14 +123,14 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
                     provider.Configuration.GraphEndpoint,
                     provider.Configuration.ApplicationId,
                     redirectUri,
-                    state);
+                    state).ConfigureAwait(false);
 
                 message = context.MakeMessage();
 
                 message.Attachments.Add(SigninCard.Create(
                     Resources.SigninCardText, Resources.LoginCaptial, authUrl).ToAttachment());
 
-                await context.PostAsync(message);
+                await context.PostAsync(message).ConfigureAwait(false);
                 context.Wait(MessageReceivedAsync);
             }
             finally
